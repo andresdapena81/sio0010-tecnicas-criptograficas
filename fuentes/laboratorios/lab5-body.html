@@ -1,0 +1,396 @@
+<!-- titulo: Laboratorio 5 · SIO0010 Técnicas Criptográficas -->
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 5 · Sesión 5</div>
+  <h1>Inspeccionar, construir y romper una cadena</h1>
+  <p class="lead">Cincuenta minutos. El lector de certificados y el simulador de la cadena de confianza corren en su navegador, sin conexión. Construir una autoridad y emitir certificados se hace con OpenSSL en su máquina: los comandos están abajo.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que los comandos corran. Se evalúa que expliquen <b>qué comprueba un navegador antes de confiar en un certificado, y en qué punto exacto falla el de Coopaburrá</b>. El hallazgo H5 se entiende cuando vean su propio navegador aceptar sin chistar un certificado que no debería.</div>
+</header>
+
+<nav class="nav">
+  <a href="#e1">Ejercicio 1 · Inspeccionar</a>
+  <a href="#d1">Demo · La cadena de confianza</a>
+  <a href="#e2">Ejercicio 2 · Su propia autoridad</a>
+  <a href="#e3">Ejercicio 3 · Romperla</a>
+  <a href="#e4">Ejercicio 4 · Diagnosticar el canal</a>
+  <a href="#rep">Repaso</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- EJERCICIO 1 · INSPECCIONAR -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 10 minutos</div><h2>Inspeccionar un certificado</h2></div>
+  <p class="lead">Peguen un certificado en formato PEM y lean sus campos sin pasar por el navegador. Viene cargado uno de ejemplo con la estructura de la evidencia A del caso; reemplácenlo por el de un sitio real.</p>
+  <div class="panel inter">
+    <div class="et">Certificado en PEM</div>
+    <textarea id="c1pem" spellcheck="false" style="min-height:150px;font-size:11px">-----BEGIN CERTIFICATE-----
+MIIDpjCCAo6gAwIBAgIUWwzrsR7IbCWg4vWFC6WSgjSFCNwwDQYJKoZIhvcNAQEL
+BQAwRDELMAkGA1UEBhMCQ08xEzARBgNVBAoMCkNvb3BhYnVycmExIDAeBgNVBAMM
+F0Nvb3BhYnVycmEgUm9vdCBDQSAyMDE5MB4XDTI2MDkyMjIyMTkyMloXDTI3MTAy
+NzIyMTkyMlowQjELMAkGA1UEBhMCQ08xEzARBgNVBAoMCkNvb3BhYnVycmExHjAc
+BgNVBAMMFXBvcnRhbC5jb29wYWJ1cnJhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBALHN3duSHtIH7Go0BPgjW6IiUDyfXXz42EZGFU1MGeE25MEm
+jxOjwWPkBo/+V1P34zlxOjX0+fF+YjKElmtAhwvRkJFu1K4Sh21s2Gwx9H0Efig2
+8h5O7MY10MURPZERqR1zbBQ1itc/+gZm1UkoUVMNjA0CpN+h30xvIEbrvdga//7+
+vcN5nc3yGdFjbkYoIGt5gIcT8HnDtSc4y/SsEaaew3QN7oAbfBxmBJ25RW+78C3h
+rLj09cWPJyE4WrrJ6GBIsGmfszQKijAUPYo9uIN+h88XaOB5kNKUnNk0CNd4l0Ll
+wDIx7TSKOONNdumFwM73VnErq04ABiVkdXhvIW8CAwEAAaOBkTCBjjA0BgNVHREE
+LTArghVwb3J0YWwuY29vcGFidXJyYS5jb22CEnd3dy5jb29wYWJ1cnJhLmNvbTAJ
+BgNVHRMEAjAAMAsGA1UdDwQEAwIFoDAdBgNVHQ4EFgQUypHnRREUTR4+j9VzZ042
+YFFk4h4wHwYDVR0jBBgwFoAUVF6H9l7rxLbrYA9fMlS48QmdimYwDQYJKoZIhvcN
+AQELBQADggEBAHP5dMWH5AHNg0EF5cLTvmXq3rA4+/4Mr0Z6ydje8kKFVJIVsvip
+otmlI6OK5aq+3HUO9enV6nh2X6LiOX7/9GEh1UbfBava2w1vZJfgRzKY4mC1st4X
+bfQVOXsz+ny1W+MRS1hFP98hWlrXdocpYOQ1N05fVZR98jAOAFqTbPqNQGIlUZof
+jBaLLQ5T+lH3JfRnoLsKxLHtqdikZ8QpW1SBSkcha0kHqZ5bZRb1w2dYxEFlPwp1
+V/Y2gzBOmrQ00wy6m/Icu/XJLTUzM4CcETqG6QBX5CNqrIYUY8C7YXfo11zcOvIq
+L9+KK0BeXvD2jfJ2PMsnA4cMVrnJhQ05Bho=
+-----END CERTIFICATE-----</textarea>
+    <div class="fila"><button id="c1go">Leer los campos</button><button class="sec" id="c1demo">Cargar el de ejemplo</button></div>
+    <div id="c1out"></div>
+  </div>
+  <div class="cmd-t">Para bajar el certificado de un sitio real, desde la terminal</div>
+  <div class="cmd"><pre><span class="c"># deja el certificado del sitio en sitio.crt, listo para pegar arriba</span>
+echo | openssl s_client -connect www.iue.edu.co:443 -servername www.iue.edu.co 2&gt;/dev/null   | openssl x509 &gt; sitio.crt</pre></div>
+  <div class="cmd-t">O en Python, que es como va en el informe</div>
+  <div class="cmd"><pre><span class="n">import</span> ssl
+<span class="n">from</span> cryptography <span class="n">import</span> x509
+
+pem = ssl.get_server_certificate((<span class="n">"www.iue.edu.co"</span>, 443))
+cert = x509.load_pem_x509_certificate(pem.encode())
+
+print(<span class="n">"Emisor:  "</span>, cert.issuer.rfc4514_string())
+print(<span class="n">"Vigencia:"</span>, cert.not_valid_before_utc, <span class="n">"->"</span>, cert.not_valid_after_utc)
+nombres = cert.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+print(<span class="n">"Ampara:  "</span>, nombres.value.get_values_for_type(x509.DNSName))
+print(<span class="n">"Firma:   "</span>, cert.signature_hash_algorithm.name)</pre></div>
+  <div class="adv"><b>Comparen con la evidencia A del caso.</b> El certificado del portal no es débil en sí: RSA 2048 con SHA-256 es aceptable. El problema, que van a ver en la demostración siguiente, es <b>quién lo emitió</b> y qué pasa el 14 de junio de 2026.</div>
+</section>
+
+
+<!-- DEMO · CADENA DE CONFIANZA -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración · 5 minutos</div><h2>Qué comprueba el navegador</h2></div>
+  <p class="lead">Antes de mostrar el candado, el navegador hace tres comprobaciones sobre el certificado. Cámbielas y vea cuándo confía y cuándo advierte. Coopaburrá falla en la primera.</p>
+  <div class="panel inter">
+    <div class="et">Las tres comprobaciones</div>
+    <div class="fila"><label><input type="checkbox" id="k1" checked style="width:auto"> El emisor está en el almacén de confianza del navegador</label></div>
+    <div class="fila"><label><input type="checkbox" id="k2" checked style="width:auto"> El nombre del certificado coincide con el del sitio</label></div>
+    <div class="fila"><label><input type="checkbox" id="k3" checked style="width:auto"> La fecha de hoy está dentro de la vigencia</label></div>
+    <div class="sal" id="kout" style="margin-top:10px">—</div>
+  </div>
+  <details><summary>Por qué la primera comprobación es la que hunde a Coopaburrá</summary>
+    <p>El navegador trae de fábrica una lista de autoridades certificadoras en las que confía: unas cuantas decenas, auditadas y públicas. Cuando llega un certificado, comprueba que lo haya firmado una de ellas, o alguien en quien una de ellas confíe. La autoridad interna de Coopaburrá, «Coopaburra Root CA 2019», no está en esa lista y nunca lo estará: la creó un contratista en 2019 para no pagar certificados.</p>
+    <p>Por eso los asociados ven una advertencia en cada visita. Y como llevan años viéndola, aprendieron a aceptarla sin leerla —exactamente lo que un atacante necesita—. El ejercicio 3 les va a mostrar por qué esa advertencia no es un formalismo.</p>
+  </details>
+</section>
+
+<!-- EJERCICIO 2 · SU PROPIA AUTORIDAD -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 15 minutos</div><h2>Construir su propia autoridad</h2></div>
+  <p class="lead">Creen una raíz, emitan un certificado de servidor y háganlo funcionar. Van a reproducir exactamente lo que hizo Coopaburrá en 2019, y a sentir por qué es tan fácil.</p>
+  <div class="cmd"><pre><span class="c"># 1 · crear la raiz: su propia autoridad certificadora</span>
+openssl req -x509 -newkey rsa:4096 -keyout raiz.key -out raiz.crt -days 3650 \
+  -nodes -subj "/CN=Mi Autoridad de Practica"
+
+<span class="c"># 2 · una llave y una solicitud para un servidor</span>
+openssl req -newkey rsa:2048 -keyout servidor.key -out servidor.csr \
+  -nodes -subj "/CN=mi-sitio.local"
+
+<span class="c"># 3 · la raiz firma el certificado del servidor</span>
+openssl x509 -req -in servidor.csr -CA raiz.crt -CAkey raiz.key \
+  -CAcreateserial -out servidor.crt -days 365
+
+<span class="c"># 4 · verificar la cadena</span>
+openssl verify -CAfile raiz.crt servidor.crt</pre></div>
+  <div class="adv"><b>Cuatro comandos.</b> Eso es todo lo que hace falta para montar una autoridad certificadora que emite certificados de apariencia impecable. La dificultad no está en crearla: está en custodiar la llave de la raíz, y ahí es donde Coopaburrá falló. Esa llave está en un computador encendido, sin contraseña, de alguien que ya no trabaja allí.</div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>La salida de <b>openssl verify</b> confirmando la cadena.</li>
+      <li>Una frase: si crear la autoridad es tan fácil, ¿qué es exactamente lo difícil, y por qué existen las autoridades públicas?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- EJERCICIO 3 · ROMPERLA -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Romper la cadena de confianza</h2></div>
+  <p class="lead">El ejercicio que hay que entender. Con esa misma raíz, emitan un certificado para un dominio que <b>no es suyo</b>, instalen la raíz en su navegador y observen que no aparece ninguna advertencia.</p>
+  <div class="cmd"><pre><span class="c"># emitir un certificado para un dominio ajeno, con SU raiz</span>
+openssl req -newkey rsa:2048 -keyout falso.key -out falso.csr \
+  -nodes -subj "/CN=www.un-banco-cualquiera.com"
+openssl x509 -req -in falso.csr -CA raiz.crt -CAkey raiz.key \
+  -CAcreateserial -out falso.crt -days 365
+
+<span class="c"># mirar el certificado: dice ser de un dominio que no es suyo</span>
+openssl x509 -in falso.crt -noout -subject</pre></div>
+  <div class="adv"><b>Háganlo solo en su equipo y retiren la raíz al terminar.</b> Cuando instalen su raíz en el navegador y este acepte sin chistar un certificado que ustedes emitieron para un dominio ajeno, van a entender el hallazgo H5 mejor que con cualquier explicación. Lo único que separa a un impostor de un sitio legítimo es <b>quién controla una raíz de confianza</b>. Quien tenga la llave de la raíz de Coopaburrá puede hacer esto contra cualquier sitio, para los 142.000 asociados.</div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>El certificado falso, con el <b>subject</b> que muestra un dominio que no es suyo.</li>
+      <li>La explicación de por qué el navegador lo aceptó, ligada a la primera comprobación de la demostración.</li>
+      <li><b>La frase clave:</b> qué puede hacer, concretamente, quien tenga la llave privada de la autoridad interna de Coopaburrá, que está en el computador del ex contratista.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- EJERCICIO 4 · DIAGNOSTICAR EL CANAL -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Ejercicio 4 · 10 minutos</div><h2>Diagnosticar el canal</h2></div>
+  <p class="lead">Revisen las versiones y las suites que ofrece un servidor, y produzcan el listado de lo que habría que apagar, con la justificación de cada línea. La evidencia A dice que el portal ofrece TLS 1.0, 1.1 y 1.2.</p>
+  <div class="cmd"><pre><span class="c"># versiones y suites que acepta un servidor</span>
+nmap --script ssl-enum-ciphers -p 443 www.iue.edu.co
+
+<span class="c"># o, sin nmap, probar una version concreta:</span>
+openssl s_client -connect www.iue.edu.co:443 -tls1_2 &lt;/dev/null
+openssl s_client -connect www.iue.edu.co:443 -tls1_3 &lt;/dev/null</pre></div>
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>El listado de versiones que habría que desactivar en el portal, según la evidencia A, con una razón por cada una.</li>
+      <li>Qué versión debería quedar como mínimo, y por qué las anteriores ya no se aceptan en 2026.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- REPASO -->
+<section id="rep">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué comprobación falló?</h2></div>
+  <p class="lead">Seis situaciones sobre certificados y canal. Elijan la causa.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ENTREGA -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo al final del bloque. Se evalúa el análisis, no el resultado.</p>
+  <ul class="chk">
+    <li>Los campos del certificado del ejercicio 1, con la comparación frente a la evidencia A.</li>
+    <li>La salida de <b>openssl verify</b> del ejercicio 2 y la frase sobre qué es lo difícil de una autoridad.</li>
+    <li>El certificado falso del ejercicio 3 y la explicación de por qué el navegador lo aceptó.</li>
+    <li>El listado de versiones a desactivar del ejercicio 4, con su justificación.</li>
+    <li>Una frase que conecte todo: por qué el hallazgo H5 es, a la vez, un problema de custodia de llave y un problema de confianza.</li>
+  </ul>
+  <div class="adv"><b>Regla de trabajo del módulo.</b> La raíz de práctica que instalen en el navegador es un riesgo mientras esté instalada: cualquiera con su llave podría suplantar sitios ante su equipo. Retírenla apenas terminen el ejercicio 3.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 5</span>
+</footer>
+</div>
+
+<script>
+/* ═════════ Lector de certificados X.509 ═════════ */
+  /* Lector mínimo de certificados X.509 para el laboratorio 5.
+     Camina la estructura ASN.1/DER y saca los campos que se leen en clase.
+     No valida la firma: es para inspeccionar, no para confiar. */
+  
+  function derDePem(pem){
+    const b64 = (pem.match(/-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/) || [null, pem])[1]
+      .replace(/[^A-Za-z0-9+/=]/g, "");
+    const bin = (typeof atob === "function") ? atob(b64) : Buffer.from(b64, "base64").toString("binary");
+    const b = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+    return b;
+  }
+  
+  /* Un nodo TLV: etiqueta, y el rango [contenido, fin) dentro del arreglo. */
+  function leerTLV(b, i){
+    const tag = b[i++];
+    let len = b[i++];
+    if (len & 0x80){                       // longitud larga
+      const n = len & 0x7f; len = 0;
+      for (let k = 0; k < n; k++) len = (len << 8) | b[i++];
+    }
+    return { tag: tag, ini: i, fin: i + len, sig: i + len };
+  }
+  
+  function hijos(b, nodo){
+    const r = []; let i = nodo.ini;
+    while (i < nodo.fin){ const t = leerTLV(b, i); r.push(t); i = t.sig; }
+    return r;
+  }
+  
+  function oid(b, nodo){
+    const v = []; let i = nodo.ini;
+    const primero = b[i++]; v.push(Math.floor(primero / 40), primero % 40);
+    let x = 0;
+    while (i < nodo.fin){ const c = b[i++]; x = (x << 7) | (c & 0x7f); if (!(c & 0x80)){ v.push(x); x = 0; } }
+    return v.join(".");
+  }
+  
+  function texto(b, nodo){
+    let s = ""; for (let i = nodo.ini; i < nodo.fin; i++) s += String.fromCharCode(b[i]); return s;
+  }
+  
+  const OID = {
+    "2.5.4.3": "CN", "2.5.4.10": "O", "2.5.4.11": "OU", "2.5.4.6": "C",
+    "1.2.840.113549.1.1.11": "sha256WithRSAEncryption",
+    "1.2.840.113549.1.1.12": "sha384WithRSAEncryption",
+    "1.2.840.113549.1.1.5":  "sha1WithRSAEncryption",
+    "1.2.840.10045.4.3.2":   "ecdsa-with-SHA256",
+    "1.2.840.10045.4.3.3":   "ecdsa-with-SHA384",
+    "1.2.840.113549.1.1.1":  "rsaEncryption",
+    "1.2.840.10045.2.1":     "ecPublicKey",
+    "1.2.840.10045.3.1.7":   "P-256", "1.3.132.0.34": "P-384", "1.3.132.0.35": "P-521"
+  };
+  
+  /* Recorre un Name (RDNSequence) y devuelve {CN, O, ...} */
+  function nombre(b, nodo){
+    const r = {};
+    hijos(b, nodo).forEach(function(rdn){          // SET
+      hijos(b, rdn).forEach(function(atv){         // SEQUENCE { tipo, valor }
+        const partes = hijos(b, atv);
+        const clave = OID[oid(b, partes[0])] || oid(b, partes[0]);
+        r[clave] = texto(b, partes[1]);
+      });
+    });
+    return r;
+  }
+  
+  function fecha(b, nodo){
+    const s = texto(b, nodo);                       // UTCTime AAMMDD… o GeneralizedTime AAAAMMDD…
+    const g = nodo.tag === 0x18;
+    const aa = g ? s.slice(0, 4) : (parseInt(s.slice(0, 2), 10) < 50 ? "20" : "19") + s.slice(0, 2);
+    const p = g ? 4 : 2;
+    const mm = s.slice(p, p + 2), dd = s.slice(p + 2, p + 4), hh = s.slice(p + 4, p + 6), mi = s.slice(p + 6, p + 8);
+    return { iso: aa + "-" + mm + "-" + dd, texto: dd + "/" + mm + "/" + aa + " " + hh + ":" + mi + " UTC",
+             ms: Date.UTC(+aa, +mm - 1, +dd, +hh, +mi) };
+  }
+  
+  function sanDe(b, tbsHijos){
+    // extensiones = [3] EXPLICIT SEQUENCE OF Extension
+    const ext = tbsHijos.find(function(n){ return n.tag === 0xa3; });
+    if (!ext) return [];
+    const seq = hijos(b, ext)[0];
+    let dns = [];
+    hijos(b, seq).forEach(function(e){
+      const partes = hijos(b, e);
+      if (OID[oid(b, partes[0])] === undefined && oid(b, partes[0]) !== "2.5.29.17") return;
+      if (oid(b, partes[0]) !== "2.5.29.17") return;
+      const octet = partes[partes.length - 1];      // OCTET STRING con el GeneralNames dentro
+      const gn = leerTLV(b, octet.ini);
+      hijos(b, gn).forEach(function(nom){
+        if (nom.tag === 0x82) dns.push(texto(b, nom));   // dNSName [2]
+      });
+    });
+    return dns;
+  }
+  
+  function tamLlave(b, spki){
+    const h = hijos(b, spki);
+    const algId = hijos(b, h[0]);
+    const tipo = OID[oid(b, algId[0])] || oid(b, algId[0]);
+    if (tipo === "ecPublicKey"){
+      const curva = algId[1] ? (OID[oid(b, algId[1])] || "curva") : "curva";
+      return "EC " + curva;
+    }
+    // RSA: el BIT STRING contiene SEQUENCE { modulus INTEGER, exponent }
+    const bit = h[1];
+    const inner = leerTLV(b, bit.ini + 1);          // saltar el byte de bits no usados
+    const modulus = hijos(b, inner)[0];
+    let bits = (modulus.fin - modulus.ini) * 8;
+    if (b[modulus.ini] === 0x00) bits -= 8;         // byte de signo
+    return "RSA " + bits + " bits";
+  }
+  
+  function leerCertificado(pem){
+    const b = derDePem(pem);
+    const cert = leerTLV(b, 0);
+    const c = hijos(b, cert);                        // tbsCertificate, sigAlg, sigValue
+    const tbs = hijos(b, c[0]);
+    // saltar version[0] si está presente
+    let k = tbs[0].tag === 0xa0 ? 1 : 0;
+    k++;                                             // serialNumber
+    k++;                                             // signature (algId interno)
+    const issuer = nombre(b, tbs[k++]);
+    const val = hijos(b, tbs[k++]);
+    const desde = fecha(b, val[0]), hasta = fecha(b, val[1]);
+    const subject = nombre(b, tbs[k++]);
+    const spki = tbs[k++];
+    const sigAlg = OID[oid(b, hijos(b, c[1])[0])] || oid(b, hijos(b, c[1])[0]);
+    return {
+      issuer: issuer, subject: subject, desde: desde, hasta: hasta,
+      san: sanDe(b, tbs), llave: tamLlave(b, spki), firma: sigAlg
+    };
+  }
+
+/* ═════════ Ejercicio 1 · inspeccionar ═════════ */
+const PEM_DEMO = $("c1pem").value;
+
+function fila(k, v, clase){
+  return '<tr><td style="white-space:nowrap;font-weight:700;color:var(--tinta)">' + k +
+         '</td><td' + (clase ? ' class="' + clase + '"' : '') + '>' + v + "</td></tr>";
+}
+
+$("c1demo").addEventListener("click", function(){ $("c1pem").value = PEM_DEMO; $("c1out").innerHTML = ""; });
+
+$("c1go").addEventListener("click", function(){
+  let c;
+  try { c = leerCertificado($("c1pem").value); }
+  catch (e){ $("c1out").innerHTML = '<div class="adv" style="margin-top:12px"><b>No se pudo leer.</b> ¿El texto es un certificado en formato PEM completo, con sus líneas BEGIN y END?</div>'; return; }
+
+  const ahora = Date.now();
+  const vigente = ahora >= c.desde.ms && ahora <= c.hasta.ms;
+  const dias = Math.round((c.hasta.ms - ahora) / 86400000);
+  const nom = o => Object.keys(o).map(k => k + "=" + o[k]).join(", ") || "(vacío)";
+  const debil = /sha1/i.test(c.firma);
+
+  $("c1out").innerHTML =
+    '<table style="margin-top:12px"><tbody>' +
+    fila("Emisor", nom(c.issuer)) +
+    fila("Sujeto", nom(c.subject)) +
+    fila("Ampara (SAN)", c.san.join(", ") || "—") +
+    fila("Válido desde", c.desde.texto) +
+    fila("Válido hasta", c.hasta.texto + (vigente ? " · vigente, faltan " + dias + " días" : " · VENCIDO o aún no válido"),
+         vigente ? "" : "mal") +
+    fila("Llave pública", c.llave) +
+    fila("Algoritmo de firma", c.firma + (debil ? " · obsoleto" : ""), debil ? "mal" : "") +
+    "</tbody></table>" +
+    '<div class="leyenda">Este lector no valida la firma ni la cadena: es para inspeccionar los campos, no para decidir si confiar. De eso se ocupa la demostración siguiente.</div>';
+});
+
+/* ═════════ Demostración · cadena de confianza ═════════ */
+function pintaCadena(){
+  const k1 = $("k1").checked, k2 = $("k2").checked, k3 = $("k3").checked;
+  const problemas = [];
+  if (!k1) problemas.push("el emisor no está en el almacén de confianza — es una autoridad que el navegador no reconoce");
+  if (!k2) problemas.push("el nombre del certificado no coincide con el del sitio — el certificado es de otro dominio");
+  if (!k3) problemas.push("la fecha de hoy está fuera de la vigencia — el certificado venció o aún no empieza");
+  let txt;
+  if (!problemas.length){
+    txt = "✓ CANDADO CERRADO\n\nLas tres comprobaciones pasan. El navegador confía y no muestra advertencia.";
+  } else {
+    txt = "✗ ADVERTENCIA A PANTALLA COMPLETA\n\nEl navegador se detiene porque:\n";
+    txt += problemas.map(p => "  · " + p).join("\n");
+    if (!k1) txt += "\n\nEste es exactamente el caso de Coopaburrá: su autoridad interna no la reconoce ningún navegador.";
+  }
+  $("kout").textContent = txt;
+}
+["k1", "k2", "k3"].forEach(id => $(id).addEventListener("change", pintaCadena));
+pintaCadena();
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["El navegador muestra una advertencia a pantalla completa en cada visita al portal, aunque el certificado no está vencido.",
+  "Emisor no confiable", "El emisor es una autoridad interna que ningún navegador reconoce. Es el hallazgo H5: la autoridad se creó en 2019 para no pagar certificados."],
+ ["Un certificado es técnicamente RSA 2048 con SHA-256, pero su llave privada está en un equipo sin contraseña de alguien que ya no trabaja en la empresa.",
+  "Custodia de la llave", "El certificado no es débil; el problema es quién controla la llave de la autoridad que lo emitió. Con esa llave se puede suplantar cualquier sitio."],
+ ["Alguien emite, con una raíz que controla, un certificado a nombre de un banco que no es suyo, y un navegador con esa raíz instalada lo acepta.",
+  "Raíz de confianza comprometida", "Si el navegador confía en la raíz, confía en todo lo que esa raíz firme. Por eso quién controla una raíz lo decide todo: es el ejercicio 3."],
+ ["El servidor todavía acepta conexiones por TLS 1.0 y TLS 1.1.",
+  "Versiones obsoletas", "TLS 1.0 y 1.1 están retirados desde 2021. Aceptarlos permite que un atacante fuerce una conexión por la versión más débil."],
+ ["El certificado del portal vence el 14 de junio y nadie sabe quién lo renueva.",
+  "Sin dueño de la renovación", "Un certificado sin responsable de renovación es una interrupción de servicio con fecha conocida. Es el reloj del caso: el 14 de junio de 2026."],
+ ["Los asociados aprendieron a hacer clic en 'aceptar el riesgo' cada vez que entran al portal.",
+  "Advertencia normalizada", "Cuando una advertencia legítima se vuelve rutina, deja de proteger: el usuario aceptaría igual el certificado de un impostor. Es la consecuencia real de H5."]
+], ["Emisor no confiable", "Custodia de la llave", "Raíz de confianza comprometida", "Versiones obsoletas", "Sin dueño de la renovación", "Advertencia normalizada"], "qver", "qreset", "qmarca");
+</script>
+

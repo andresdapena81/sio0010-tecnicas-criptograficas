@@ -1,0 +1,22 @@
+# Soluciones y claves de respuesta — no van al repositorio público
+*[Ss]olucion*
+*[Ss]oluci*n*
+ejercicios.json
+*-respuestas.*
+*clave-respuestas*
+
+# Temporales de generación
+__pycache__/
+*.pyc
+*.serial
+*.srl
+*.key
+*.csr
+*.enc
+*~$*
+~$*
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

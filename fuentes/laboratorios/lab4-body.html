@@ -1,0 +1,274 @@
+<!-- titulo: Laboratorio 4 · SIO0010 Técnicas Criptográficas -->
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 4 · Sesión 4</div>
+  <h1>Firmar, verificar y medir</h1>
+  <p class="lead">Cincuenta y cinco minutos. Las demostraciones firman y verifican en su navegador, con la misma criptografía de curva elíptica que usa un certificado real. Los comandos de OpenSSL y el ejercicio en Python están abajo, con botón de copiar.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que la firma verifique. Se evalúa que expliquen <b>qué garantiza exactamente una firma válida y qué no</b>. La pregunta del caso —cómo probar ante un juez que una operación la autorizó su titular— se responde con esa distinción, no con un comando.</div>
+</header>
+
+<nav class="nav">
+  <a href="#d1">Demo · Firmar y alterar</a>
+  <a href="#e1">Ejercicio 1 · Generar y verificar</a>
+  <a href="#e2">Ejercicio 2 · Medir RSA vs curva</a>
+  <a href="#e3">Ejercicio 3 · La llave equivocada</a>
+  <a href="#e4">Repaso</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- ───────────── DEMO ───────────── -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración · 5 minutos</div><h2>Una firma está ligada al mensaje</h2></div>
+  <p class="lead">Se genera una pareja de llaves, se firma el pagaré y se verifica. Después cambie un solo carácter del texto y verifique de nuevo: la firma deja de valer, sin tocar la firma misma. Eso es lo que significa «ligada al mensaje».</p>
+  <div class="panel inter">
+    <div class="et">El pagaré</div>
+    <input type="text" id="d1t" value="Pagaré 2026-0415 por 180.000.000" spellcheck="false">
+    <div class="fila">
+      <button id="d1gen">1 · Generar llaves</button>
+      <button id="d1sig" class="sec" disabled>2 · Firmar</button>
+      <button id="d1ver" class="sec" disabled>3 · Verificar</button>
+    </div>
+    <div class="sal" id="d1s">Genere una pareja de llaves para empezar. Es de curva elíptica P-256, la misma de un certificado moderno.</div>
+    <div class="leyenda">Cambie un carácter del pagaré después de firmar y pulse Verificar: verá el resultado pasar a inválido.</div>
+  </div>
+  <details><summary>Qué son la llave privada y la llave pública, en una frase cada una</summary>
+    <p><b>La llave privada</b> firma, y no sale nunca de quien firma. <b>La llave pública</b> verifica, y se la puede dar a todo el mundo. Nadie puede producir una firma que verifique con una llave pública sin tener la privada correspondiente: por eso una firma válida prueba que quien firmó tenía esa llave privada. Guarde esa última frase entera, porque el ejercicio 3 la va a poner a prueba: prueba que <b>la llave firmó</b>, no que <b>una persona quiso firmar</b>.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 1 ───────────── -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 15 minutos</div><h2>Generar, firmar y verificar</h2></div>
+  <p class="lead">Generen una pareja de llaves, firmen un documento, verifíquenlo. Después cambien un solo carácter del documento y vuelvan a verificar. Documenten qué ocurre y por qué.</p>
+
+  <div class="cmd-t">Con OpenSSL · una pareja de curva elíptica</div>
+  <div class="cmd"><pre><span class="c"># generar la pareja de llaves</span>
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out ec.key
+openssl pkey -in ec.key -pubout -out ec.pub
+
+<span class="c"># firmar el documento y verificar la firma</span>
+openssl dgst -sha256 -sign ec.key -out doc.sig documento.pdf
+openssl dgst -sha256 -verify ec.pub -signature doc.sig documento.pdf
+
+<span class="c"># cambien un byte de documento.pdf y repitan la verificación:</span>
+<span class="c"># la última orden dirá "Verification Failure"</span></pre></div>
+
+  <div class="cmd-t">O en Python, con Ed25519, la firma moderna por defecto</div>
+  <div class="cmd"><pre><span class="c"># pip install cryptography</span>
+<span class="n">from</span> cryptography.hazmat.primitives.asymmetric <span class="n">import</span> ed25519
+<span class="n">from</span> cryptography.exceptions <span class="n">import</span> InvalidSignature
+
+privada = ed25519.Ed25519PrivateKey.generate()
+publica = privada.public_key()
+
+doc = b<span class="n">"Pagare 2026-0415 por 180.000.000"</span>
+firma = privada.sign(doc)
+
+publica.verify(firma, doc)                              <span class="c"># correcto: no lanza nada</span>
+<span class="n">try</span>:
+    publica.verify(firma, b<span class="n">"Pagare 2026-0415 por 980.000.000"</span>)   <span class="c"># un dígito distinto</span>
+<span class="n">except</span> InvalidSignature:
+    print(<span class="n">"la firma no corresponde a este documento"</span>)</pre></div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>La firma verificando sobre el documento original, y fallando sobre el alterado.</li>
+      <li>La explicación de por qué basta cambiar un carácter para que falle, ligándola con lo que aprendieron de las funciones de resumen en la sesión 3.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────── EJERCICIO 2 ───────────── -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 20 minutos</div><h2>Medir la diferencia entre RSA y curva elíptica</h2></div>
+  <p class="lead">Comparen tiempo de generación, tiempo de firma y tamaño de llave entre RSA y curva elíptica al mismo nivel de seguridad. Este panel lo mide en su navegador; lleven los números a una tabla.</p>
+
+  <div class="panel inter">
+    <div class="et">Banco de pruebas</div>
+    <div class="fila">
+      <label for="e2n">Firmas a cronometrar</label>
+      <select id="e2n" style="width:auto"><option>50</option><option selected>200</option><option>500</option></select>
+      <button id="e2go">Medir RSA-3072 y curva P-256</button>
+    </div>
+    <div class="sal" id="e2s">Los dos ofrecen un nivel de seguridad equivalente a 128 bits. Lo que cambia es el costo.</div>
+  </div>
+  <details><summary>Por qué la comparación es justa a «128 bits»</summary>
+    <p>RSA y las curvas elípticas resuelven problemas matemáticos distintos, así que sus tamaños de llave no se comparan directamente. Para igualar la dificultad —lo que costaría romperlos— hay tablas de equivalencia: <b>RSA-3072 equivale a curva P-256</b>, y ambos a unos 128 bits de seguridad simétrica. Comparar RSA-3072 con P-256 es comparar dos cerraduras igual de difíciles de forzar, y ver cuál pesa menos y se abre más rápido.</p>
+    <p>El resultado, que van a ver en los números: la curva genera la llave y firma mucho más rápido, y su llave es una fracción del tamaño. Por eso un teléfono firma con curva y no con RSA, y por eso importa para la aplicación del asociado.</p>
+  </details>
+
+  <div class="cmd-t">La misma medición con OpenSSL, para contrastar</div>
+  <div class="cmd"><pre>openssl speed rsa3072 ecdsap256</pre></div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>La tabla con las tres columnas —generar, firmar, tamaño— para los dos esquemas.</li>
+      <li>Una frase sobre por qué esa diferencia importa para la aplicación móvil de Coopaburrá, que firma en el teléfono del asociado.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────── EJERCICIO 3 ───────────── -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Verificar con la llave equivocada</h2></div>
+  <p class="lead">Aquí está el corazón del caso. Se firma un documento con la llave de <b>Ana</b> y se intenta verificar con la llave pública de <b>Beto</b>. Después se responde la pregunta que dejó mudo al comité.</p>
+
+  <div class="panel inter">
+    <div class="et">Dos personas, dos parejas de llaves</div>
+    <input type="text" id="e3t" value="Autorizo la transferencia de mi cuenta" spellcheck="false">
+    <div class="fila">
+      <button id="e3go">Firmar con Ana y verificar con las dos llaves</button>
+    </div>
+    <div class="sal" id="e3s">—</div>
+  </div>
+
+  <details><summary>Qué garantiza la firma válida, y qué no — léalo antes de escribir el informe</summary>
+    <p>Cuando la firma verifica con la llave pública de Ana, queda probado que <b>la llave privada de Ana</b> produjo esa firma sobre ese documento exacto. Eso es mucho: nadie sin esa llave pudo haberla hecho, y el documento no se tocó después.</p>
+    <p>Lo que <b>no</b> queda probado es que Ana, la persona, quisiera firmar. Si su llave estaba en un archivo que compartían once personas —H2 del caso— o en un teléfono que perdió, la firma es válida y aun así no dice que fue ella. La firma prueba <b>qué llave firmó</b>. Que esa llave sea de una persona, y solo de ella, es un problema distinto: es la custodia de la llave, y es lo que Coopaburrá no tiene.</p>
+    <p>Por eso el no repudio no lo da el algoritmo de firma por sí solo. Lo dan tres cosas juntas: una firma que verifica, una llave que pertenece a una sola persona y está bajo su control exclusivo, y un tercero que dé fe de ese vínculo. Las dos últimas son el tema de la sesión 5.</p>
+  </details>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>El resultado: verifica con la llave de Ana, falla con la de Beto.</li>
+      <li><b>La respuesta a la pregunta del caso:</b> qué quedaría todavía sin resolver aunque la firma de una operación verifique correctamente. Esa frase es el puente a la sesión del martes.</li>
+      <li>Una línea sobre el hallazgo H2: con la llave de firma compartida por 142.000 personas, ¿qué prueba realmente una operación «firmada»?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────── REPASO ───────────── -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué servicio da, y cuál no?</h2></div>
+  <p class="lead">Seis situaciones sobre firma digital. Elijan qué es lo que realmente está en juego.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ───────────── ENTREGA ───────────── -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo con la tabla del ejercicio 2 y, sobre todo, la respuesta del ejercicio 3.</p>
+  <ul class="chk">
+    <li>La firma del ejercicio 1 verificando y fallando, con la explicación del porqué.</li>
+    <li>La tabla de tiempos y tamaños de RSA frente a curva elíptica.</li>
+    <li>La respuesta central: qué queda sin resolver aunque la firma verifique.</li>
+    <li>La conexión con H2: qué prueba una operación firmada con una llave que tienen 142.000 personas.</li>
+    <li>Una frase sobre el artículo 28 de la Ley 527: qué significa que la firma esté «ligada al mensaje», ahora que lo vieron pasar en pantalla.</li>
+  </ul>
+  <div class="adv"><b>Regla de trabajo del módulo.</b> Las llaves privadas que generen en el laboratorio son de práctica: no las reutilicen para nada real y bórrenlas al terminar. Una llave privada que pasó por un archivo temporal ya no sirve para firmar nada serio.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 4</span>
+</footer>
+</div>
+
+<script>
+/* Firma con ECDSA P-256 y SHA-256: es lo que WebCrypto ofrece en todo navegador
+   y equivale, en función y en garantías, a lo que hace un certificado real. */
+const ECDSA = { name: "ECDSA", namedCurve: "P-256" };
+const FIRMA = { name: "ECDSA", hash: "SHA-256" };
+
+async function generaPareja(){ return crypto.subtle.generateKey(ECDSA, true, ["sign", "verify"]); }
+async function firma(priv, txt){ return new Uint8Array(await crypto.subtle.sign(FIRMA, priv, bytes(txt))); }
+async function verifica(pub, sig, txt){ return crypto.subtle.verify(FIRMA, pub, sig, bytes(txt)); }
+
+/* ═════════ Demostración ═════════ */
+let d1 = {};
+$("d1gen").addEventListener("click", async function(){
+  d1.par = await generaPareja(); d1.sig = null;
+  $("d1sig").disabled = false; $("d1ver").disabled = true;
+  const pub = new Uint8Array(await crypto.subtle.exportKey("raw", d1.par.publicKey));
+  $("d1s").textContent = "Pareja de llaves generada.\nLlave pública (la que se puede repartir):\n" + bloques(hex(pub), 4);
+});
+$("d1sig").addEventListener("click", async function(){
+  d1.textoFirmado = $("d1t").value;
+  d1.sig = await firma(d1.par.privateKey, d1.textoFirmado);
+  $("d1ver").disabled = false;
+  $("d1s").textContent = "Firmado el texto:\n  \"" + d1.textoFirmado + "\"\n\nFirma (" + d1.sig.length + " bytes):\n" + bloques(hex(d1.sig), 4);
+});
+$("d1ver").addEventListener("click", async function(){
+  const actual = $("d1t").value;
+  const ok = await verifica(d1.par.publicKey, d1.sig, actual);
+  const cambio = actual !== d1.textoFirmado;
+  $("d1s").textContent =
+    "Se firmó : \"" + d1.textoFirmado + "\"\n" +
+    "Se verifica: \"" + actual + "\"\n\n" +
+    (ok ? "✓ FIRMA VÁLIDA — el documento es idéntico al que se firmó"
+        : "✗ FIRMA INVÁLIDA — " + (cambio ? "el documento cambió después de firmar" : "no corresponde"));
+});
+
+/* ═════════ Ejercicio 2 · RSA frente a curva ═════════ */
+$("e2go").addEventListener("click", async function(){
+  const n = parseInt($("e2n").value, 10);
+  $("e2s").textContent = "generando llaves y cronometrando " + n + " firmas de cada tipo…";
+
+  // curva P-256
+  let t = performance.now();
+  const ec = await generaPareja();
+  const ecGen = performance.now() - t;
+  const msg = bytes("documento de prueba para el banco de firmas");
+  t = performance.now();
+  for (let i = 0; i < n; i++) await crypto.subtle.sign(FIRMA, ec.privateKey, msg);
+  const ecFirma = (performance.now() - t) / n;
+  const ecPub = new Uint8Array(await crypto.subtle.exportKey("raw", ec.publicKey)).length;
+
+  // RSA-3072
+  const RSA = { name: "RSA-PSS", modulusLength: 3072, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" };
+  t = performance.now();
+  const rsa = await crypto.subtle.generateKey(RSA, true, ["sign", "verify"]);
+  const rsaGen = performance.now() - t;
+  t = performance.now();
+  for (let i = 0; i < n; i++) await crypto.subtle.sign({ name: "RSA-PSS", saltLength: 32 }, rsa.privateKey, msg);
+  const rsaFirma = (performance.now() - t) / n;
+  const rsaPub = (await crypto.subtle.exportKey("spki", rsa.publicKey)).byteLength;
+
+  const fila = (a, b) => { a = String(a); return a + " ".repeat(Math.max(1, 22 - a.length)) + b; };
+  $("e2s").textContent =
+    fila("", "curva P-256      RSA-3072") + "\n" +
+    fila("generar la llave", ms(ecGen).padEnd(17) + ms(rsaGen)) + "\n" +
+    fila("firmar (media)", ms(ecFirma).padEnd(17) + ms(rsaFirma)) + "\n" +
+    fila("tamaño llave púb.", (ecPub + " B").padEnd(17) + (rsaPub + " B")) + "\n\n" +
+    "La curva es más rápida y su llave pesa una fracción, al mismo nivel de seguridad.";
+});
+
+/* ═════════ Ejercicio 3 · la llave equivocada ═════════ */
+$("e3go").addEventListener("click", async function(){
+  const txt = $("e3t").value;
+  const ana = await generaPareja(), beto = await generaPareja();
+  const sig = await firma(ana.privateKey, txt);
+  const conAna = await verifica(ana.publicKey, sig, txt);
+  const conBeto = await verifica(beto.publicKey, sig, txt);
+  $("e3s").textContent =
+    "Documento : \"" + txt + "\"\n" +
+    "Firmado por: Ana (con su llave privada)\n\n" +
+    "Verificar con la llave pública de Ana : " + (conAna ? "✓ válida" : "✗ inválida") + "\n" +
+    "Verificar con la llave pública de Beto: " + (conBeto ? "✓ válida" : "✗ inválida") + "\n\n" +
+    "La firma solo verifica con la llave de quien firmó.\n" +
+    "Prueba QUÉ LLAVE firmó — no prueba que una persona quisiera firmar.\n" +
+    "Si esa llave la tienen 142.000 personas, la firma no señala a nadie.";
+});
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["Una firma verifica correctamente con la llave pública de Ana.",
+  "La llave de Ana firmó", "Prueba que la llave privada de Ana produjo la firma sobre ese documento. No prueba, por sí solo, que Ana en persona lo quisiera."],
+ ["Se cambia un carácter del documento y la firma deja de verificar.",
+  "Integridad", "La firma está ligada al contenido exacto. Cualquier cambio, por mínimo, la invalida. Es el artículo 28 en acción."],
+ ["La llave privada de firma está en un archivo que comparten once personas.",
+  "No hay no repudio", "Aunque la firma verifique, cualquiera de los once pudo hacerla. Sin control exclusivo de la llave, no hay no repudio: es el hallazgo H2."],
+ ["Un teléfono firma cada operación en menos de un milisegundo, con una llave de 32 bytes.",
+  "Curva elíptica", "Ese rendimiento y ese tamaño son de curva elíptica. RSA al mismo nivel sería más lento y su llave mucho más grande."],
+ ["Hace falta, además de la firma, que un tercero dé fe de que la llave es de esa persona.",
+  "Certificado", "El vínculo entre una llave y una identidad lo establece un certificado emitido por una autoridad. Es el tema de la sesión 5."],
+ ["Se firma un pagaré hoy que debe seguir siendo probatorio en 2039.",
+  "Sello de tiempo", "Una firma sin fecha certificada no prueba cuándo se firmó, y los algoritmos envejecen. Hace falta un sello de tiempo, que se ve en la sesión 6."]
+], ["La llave de Ana firmó", "Integridad", "No hay no repudio", "Curva elíptica", "Certificado", "Sello de tiempo"], "qver", "qreset", "qmarca");
+</script>

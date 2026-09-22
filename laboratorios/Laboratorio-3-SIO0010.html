@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio 3 · SIO0010 Técnicas Criptográficas</title>
+<style>
+/* Hoja común de los laboratorios de SIO0010. Misma identidad del laboratorio 1.
+   Al final está la hoja de impresión: el PDF de cada laboratorio sale de este mismo archivo. */
+:root{
+  --naranja:#F36406; --naranja-lav:#FDEFE9; --azul:#154361; --azul-lav:#E9F0F5;
+  --tinta:#15171C; --tinta-2:#4A505C; --gris:#5C5C5C; --papel:#FFFFFF; --papel-2:#F4F4F4;
+  --linea:#D8DBDF; --linea-suave:#E9EBEE; --verde:#1B6B47; --verde-lav:#E1F0E8;
+  --rojo:#A8321B; --rojo-lav:#FBEAE6;
+  --mono:"Consolas","Cascadia Mono",ui-monospace,monospace;
+  --sans:Arial,Helvetica,sans-serif; --titular:"Arial Black",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel-2);color:var(--tinta);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px 80px;background:var(--papel)}
+header.top{padding:26px 0 0}
+.marca{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.marca img{height:40px;width:auto}
+.regla{height:5px;background:var(--tinta);margin:0 0 12px}
+.kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;color:var(--gris)}
+h1{font-family:var(--titular);font-size:38px;line-height:1.1;margin:8px 0 14px;letter-spacing:-.01em}
+.lead{font-size:16px;color:var(--tinta-2);max-width:78ch}
+.aviso{border-left:4px solid var(--naranja);background:var(--naranja-lav);padding:12px 16px;margin:18px 0}
+.aviso b{color:var(--tinta)}
+.adv{border-left:4px solid var(--rojo);background:var(--rojo-lav);padding:12px 16px;margin:16px 0;font-size:14.5px;color:var(--tinta-2)}
+.adv b{color:var(--rojo)}
+section{margin-top:44px;scroll-margin-top:16px}
+.sec-h{border-top:4px solid var(--tinta);padding-top:10px;margin-bottom:16px}
+.sec-n{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--naranja)}
+h2{font-family:var(--titular);font-size:25px;margin:6px 0 0;letter-spacing:-.01em}
+h3{font-size:16px;margin:22px 0 8px}
+.nav{position:sticky;top:0;background:var(--papel);border-bottom:1px solid var(--linea);padding:10px 0;z-index:9;display:flex;gap:6px;flex-wrap:wrap}
+.nav a{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--gris);border:1px solid var(--linea);padding:5px 9px;border-radius:2px}
+.nav a:hover{color:var(--naranja);border-color:var(--naranja)}
+.panel{border:1px solid var(--linea);border-radius:3px;padding:16px;margin:14px 0;background:var(--papel)}
+.et{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--azul);margin-bottom:7px}
+textarea,input[type=text],input[type=number],select{width:100%;font-family:var(--mono);font-size:13px;padding:9px 11px;border:1px solid var(--linea);border-radius:2px;background:var(--papel);color:var(--tinta);resize:vertical}
+textarea{min-height:72px}
+.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.fila label{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris);font-weight:700}
+button{font-family:var(--sans);font-size:13px;font-weight:700;padding:8px 15px;border:1px solid var(--tinta);background:var(--tinta);color:#fff;border-radius:2px;cursor:pointer}
+button:hover{background:var(--naranja);border-color:var(--naranja)}
+button.sec{background:transparent;color:var(--tinta)}
+button.sec:hover{color:var(--naranja)}
+button:disabled{opacity:.45;cursor:default}
+input[type=range]{flex:1;min-width:190px;accent-color:var(--naranja)}
+.sal{font-family:var(--mono);font-size:13px;background:var(--papel-2);border:1px solid var(--linea-suave);border-radius:2px;padding:11px 13px;white-space:pre-wrap;word-break:break-word;min-height:42px}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tres{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.dos,.tres{grid-template-columns:1fr}}
+.imgs{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.imgs figure{margin:0;text-align:center}
+.imgs img{width:230px;height:230px;image-rendering:pixelated;border:1px solid var(--linea)}
+.imgs figcaption{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-top:8px;line-height:1.5}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--azul);padding:7px 9px;font-weight:700}
+td{padding:6px 9px;border-bottom:1px solid var(--linea-suave);color:var(--tinta-2);vertical-align:top}
+td b{color:var(--tinta)}
+.leyenda{font-family:var(--mono);font-size:10.5px;color:var(--gris);margin-top:14px;line-height:1.7}
+.ok{color:var(--verde);font-weight:700}
+.mal{color:var(--naranja);font-weight:700}
+.rojo{color:var(--rojo);font-weight:700}
+details{border:1px solid var(--linea);border-radius:2px;padding:10px 14px;margin-top:12px;background:var(--papel-2)}
+summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--azul)}
+details p{margin:9px 0 0;font-size:14px;color:var(--tinta-2)}
+details p:first-of-type{margin-top:10px}
+
+/* bloque de comandos con botón de copiar */
+.cmd{position:relative;background:#15171C;border-radius:3px;padding:13px 15px;margin:11px 0;overflow-x:auto}
+.cmd pre{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8EAED;white-space:pre}
+.cmd .c{color:#8A9199}
+.cmd .n{color:#F0A26A}
+.cmd .copiar{position:absolute;top:8px;right:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;background:transparent;color:#8A9199;border:1px solid #3A3F47}
+.cmd .copiar:hover{color:#fff;background:transparent;border-color:#8A9199}
+.cmd-t{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--azul);margin:16px 0 -4px}
+
+/* pasos numerados */
+ol.pasos{margin:12px 0 0;padding:0;list-style:none;counter-reset:pp}
+ol.pasos li{counter-increment:pp;display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--linea-suave)}
+ol.pasos li:last-child{border-bottom:0}
+ol.pasos li::before{content:counter(pp);flex:0 0 22px;height:22px;border-radius:50%;background:var(--azul);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+ol.pasos li b{display:block;color:var(--tinta)}
+ol.pasos li span{font-size:14.5px;color:var(--tinta-2)}
+
+/* tarjetas */
+.tarj{border:1px solid var(--linea);border-radius:3px;padding:13px 15px;background:var(--papel)}
+.tarj.fill{background:var(--papel-2)}
+.tarj.az{background:var(--azul-lav);border-color:#C6D5E0}
+.tarj.na{background:var(--naranja-lav);border-color:#F5CFBF}
+.tarj h4{margin:0 0 5px;font-size:14px}
+.tarj p{margin:0;font-size:13.5px;color:var(--tinta-2)}
+
+/* entregable */
+.ent{border:2px solid var(--tinta);border-radius:3px;padding:15px 17px;margin-top:16px}
+.ent .et{color:var(--naranja)}
+.ent ul{margin:8px 0 0;padding-left:19px;font-size:14.5px;color:var(--tinta-2)}
+.ent li{margin-bottom:5px}
+
+/* casillas de verificación */
+ul.chk{margin:10px 0 0;padding:0;list-style:none}
+ul.chk li{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--linea-suave);font-size:14.5px;color:var(--tinta-2)}
+ul.chk li:last-child{border-bottom:0}
+ul.chk li::before{content:"";flex:0 0 13px;height:13px;border:1.5px solid var(--azul);border-radius:2px;margin-top:4px}
+
+/* repaso */
+.preg{border:1px solid var(--linea);border-radius:3px;padding:13px 15px;margin-bottom:9px}
+.preg .q{font-weight:700;margin-bottom:8px}
+.preg .ops{display:flex;gap:7px;flex-wrap:wrap}
+.preg .ops button{font-size:12px;padding:6px 11px;background:transparent;color:var(--tinta);border-color:var(--linea)}
+.preg .ops button.elegida{background:var(--azul);color:#fff;border-color:var(--azul)}
+.preg .fb{margin-top:9px;font-size:13.5px;display:none}
+
+footer{margin-top:54px;border-top:1px solid var(--linea);padding-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* ───────────────────────── impresión ─────────────────────────
+   El PDF de cada laboratorio se genera de este mismo archivo. */
+@media print{
+  @page{ size:A4; margin:15mm 14mm 14mm }
+  body{background:#fff;font-size:10.2pt;line-height:1.45}
+  .wrap{max-width:none;padding:0;background:#fff}
+  .nav{display:none}
+  button,input[type=range],.copiar{display:none!important}
+  h1{font-size:25pt}
+  h2{font-size:15pt}
+  h3{font-size:11.5pt}
+  .lead{font-size:10.6pt;max-width:none}
+  section{margin-top:18pt;page-break-inside:auto}
+  .sec-h{page-break-after:avoid}
+  .panel,.tarj,.ent,.preg,.adv,.aviso,details,.cmd{page-break-inside:avoid}
+  .cmd{background:#F4F4F4;border:.7pt solid var(--linea)}
+  .cmd pre{color:#15171C;font-size:8.6pt}
+  .cmd .c{color:#6A7078}
+  .cmd .n{color:#A8321B}
+  .sal{min-height:0;font-size:8.6pt}
+  .inter .sal{display:none}
+  .inter::after{content:"Panel interactivo · ábralo en el navegador para ejecutarlo";display:block;font-family:var(--mono);font-size:8.4pt;letter-spacing:.06em;color:var(--gris);border-top:.7pt solid var(--linea-suave);margin-top:8px;padding-top:7px}
+  details{background:#fff}
+  details summary{list-style:none;color:var(--azul)}
+  details summary::-webkit-details-marker{display:none}
+  table{font-size:9pt}
+  th{padding:5px 7px;font-size:7.4pt}
+  td{padding:4.5px 7px}
+  .imgs img{width:150px;height:150px}
+  footer{margin-top:20pt;font-size:8pt}
+  a{color:inherit;text-decoration:none}
+}
+
+</style>
+</head>
+<body>
+<script>
+/* Utilidades comunes de los laboratorios de SIO0010.
+   Todo ocurre en el navegador: no hay peticiones de red ni almacenamiento persistente. */
+
+const $  = id => document.getElementById(id);
+const $$ = sel => Array.prototype.slice.call(document.querySelectorAll(sel));
+
+/* ---------- bytes, hexadecimal y texto ---------- */
+const UTF8 = new TextEncoder();
+const DEC  = new TextDecoder();
+
+function bytes(txt){ return UTF8.encode(txt); }
+function texto(buf){ return DEC.decode(buf instanceof ArrayBuffer ? new Uint8Array(buf) : buf); }
+function hex(buf){
+  const b = buf instanceof ArrayBuffer ? new Uint8Array(buf) : buf;
+  return Array.prototype.map.call(b, v => v.toString(16).padStart(2, "0")).join("");
+}
+function desdeHex(s){
+  s = (s || "").replace(/[^0-9a-fA-F]/g, "");
+  const b = new Uint8Array(s.length >> 1);
+  for (let i = 0; i < b.length; i++) b[i] = parseInt(s.substr(i * 2, 2), 16);
+  return b;
+}
+function aleatorio(n){ const b = new Uint8Array(n); crypto.getRandomValues(b); return b; }
+function bloques(h, n){ return (h.match(new RegExp(".{1," + (n * 2) + "}", "g")) || []).join(" "); }
+
+/* ---------- copiar bloques de comandos ---------- */
+function montarCopias(){
+  $$(".cmd").forEach(function(caja){
+    if (caja.querySelector(".copiar")) return;
+    const b = document.createElement("button");
+    b.className = "copiar"; b.type = "button"; b.textContent = "copiar";
+    b.addEventListener("click", function(){
+      const t = caja.querySelector("pre").innerText;
+      const listo = function(){ b.textContent = "copiado"; setTimeout(function(){ b.textContent = "copiar"; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(listo, function(){ manual(t, listo); });
+      } else { manual(t, listo); }
+    });
+    caja.appendChild(b);
+  });
+  function manual(t, listo){          // sin permiso de portapapeles: selección manual
+    const a = document.createElement("textarea");
+    a.value = t; a.style.position = "fixed"; a.style.opacity = "0";
+    document.body.appendChild(a); a.select();
+    try { document.execCommand("copy"); listo(); } catch (e) {}
+    document.body.removeChild(a);
+  }
+}
+
+/* ---------- repaso de opción múltiple ----------
+   preguntas: [[enunciado, respuesta, explicación], ...]   ·   opciones: ["A", "B", ...] */
+function montarQuiz(cont, preguntas, opciones, idVer, idReset, idMarca){
+  const caja = $(cont);
+  const elegido = {};
+
+  function pinta(){
+    caja.innerHTML = "";
+    preguntas.forEach(function(p, i){
+      const d = document.createElement("div"); d.className = "preg";
+      const q = document.createElement("div"); q.className = "q"; q.textContent = (i + 1) + ". " + p[0];
+      const ops = document.createElement("div"); ops.className = "ops";
+      opciones.forEach(function(o){
+        const b = document.createElement("button"); b.type = "button"; b.textContent = o;
+        if (elegido[i] === o) b.className = "elegida";
+        b.addEventListener("click", function(){ elegido[i] = o; pinta(); marca(); });
+        ops.appendChild(b);
+      });
+      const fb = document.createElement("div"); fb.className = "fb"; fb.id = cont + "-fb" + i;
+      d.appendChild(q); d.appendChild(ops); d.appendChild(fb);
+      caja.appendChild(d);
+    });
+  }
+  function marca(){
+    const n = Object.keys(elegido).length;
+    if (idMarca) $(idMarca).textContent = n ? n + " de " + preguntas.length + " respondidas" : "";
+  }
+  function ver(){
+    preguntas.forEach(function(p, i){
+      const fb = $(cont + "-fb" + i);
+      const bien = elegido[i] === p[1];
+      fb.style.display = "block";
+      fb.innerHTML = '<span class="' + (bien ? "ok" : "mal") + '">' + (bien ? "Correcto" : "Respuesta: " + p[1]) +
+                     '</span> · <span style="color:var(--tinta-2)">' + p[2] + "</span>";
+    });
+  }
+  function reinicia(){ for (const k in elegido) delete elegido[k]; pinta(); marca(); }
+
+  if (idVer)   $(idVer).addEventListener("click", ver);
+  if (idReset) $(idReset).addEventListener("click", reinicia);
+  pinta();
+}
+
+/* ---------- cronómetro ---------- */
+async function cronometra(fn){
+  const t = performance.now();
+  const r = await fn();
+  return { ms: performance.now() - t, r: r };
+}
+function ms(v){ return v >= 1000 ? (v / 1000).toFixed(2) + " s" : v.toFixed(1) + " ms"; }
+
+/* ---------- impresión: los desplegables salen abiertos ---------- */
+function abreTodo(){ $$("details").forEach(function(d){ d.open = true; }); }
+window.addEventListener("beforeprint", abreTodo);
+if (window.matchMedia) {
+  const mq = window.matchMedia("print");
+  if (mq.addEventListener) mq.addEventListener("change", function(e){ if (e.matches) abreTodo(); });
+}
+
+document.addEventListener("DOMContentLoaded", montarCopias);
+
+</script>
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,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" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 3 · Sesión 3</div>
+  <h1>Auditar la evidencia B</h1>
+  <p class="lead">Cincuenta minutos. Trabajan sobre la muestra de la tabla de usuarios del caso. Está anonimizada: los usuarios no existen y las contraseñas del ejemplo son las genéricas de manual, pero <b>los resúmenes se comportan como los de la base de Coopaburrá</b>.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que reproduzcan un resumen. Se evalúa que expliquen <b>qué propiedad del esquema lo hace débil</b>, y que documenten la discrepancia entre lo que la documentación afirma y lo que los datos demuestran. Eso último es, literalmente, el trabajo de un auditor.</div>
+</header>
+
+<nav class="nav">
+  <a href="#d1">Demo · Efecto avalancha</a>
+  <a href="#e1">Ejercicio 1 · Qué función es</a>
+  <a href="#e2">Ejercicio 2 · Reproducir el cálculo</a>
+  <a href="#e3">Ejercicio 3 · Medir el costo</a>
+  <a href="#e4">Repaso</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- ───────────── DEMO ───────────── -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración · 5 minutos</div><h2>Un resumen no se parece a su entrada</h2></div>
+  <p class="lead">Escriba en el primer recuadro y cambie <b>una sola letra</b> en el segundo. Los dos resúmenes no se parecen en nada: esa es la propiedad que hace útil a una función de resumen, y también la que hace inútil compararlas «por parecido».</p>
+  <div class="panel inter">
+    <div class="dos">
+      <div><div class="et">Entrada A</div><textarea id="d1a" spellcheck="false">Transferencia por 100000 aprobada</textarea><div class="sal" id="d1ha" style="margin-top:8px">—</div></div>
+      <div><div class="et">Entrada B</div><textarea id="d1b" spellcheck="false">Transferencia por 900000 aprobada</textarea><div class="sal" id="d1hb" style="margin-top:8px">—</div></div>
+    </div>
+    <div class="fila"><label for="d1f">Función</label>
+      <select id="d1f" style="width:auto"><option>SHA-256</option><option>SHA-1</option><option>SHA-384</option><option>SHA-512</option></select>
+      <span class="leyenda" style="margin:0" id="d1d">—</span>
+    </div>
+  </div>
+  <details><summary>Por qué esto no protege una contraseña</summary>
+    <p>Que el resumen cambie por completo con un solo bit no protege una contraseña. Quien quiera averiguarla no intenta parecerse: <b>reproduce el cálculo</b> con una candidata y compara. La única defensa real es que cada intento cueste tiempo, y eso no lo da la función de resumen: lo da el factor de trabajo de una función de derivación, que es el ejercicio 3.</p>
+    <p>La segunda defensa es que el resultado de un intento no sirva para dos cuentas. Eso lo da <b>una sal distinta por usuario</b>. Una sal constante para toda la base —como la que declara la documentación de Coopaburrá— no aporta eso: solo obliga a rehacer el cálculo una vez más, con esa sal.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 1 ───────────── -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 10 minutos</div><h2>Identificar la función sin ver el código</h2></div>
+  <p class="lead">A partir de la longitud del resumen, determinen qué función lo produjo. Justifiquen con el número de bits, no con la apariencia.</p>
+
+  <div class="panel inter">
+    <div class="et">Analizador de resúmenes</div>
+    <input type="text" id="e1h" value="5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8" spellcheck="false">
+    <div class="fila"><button id="e1go">Analizar</button><span class="leyenda" style="margin:0">Pegue cualquiera de los resúmenes de la evidencia B</span></div>
+    <div class="sal" id="e1s">—</div>
+  </div>
+
+  <h3>La evidencia B, tal como está en el expediente</h3>
+  <div class="cmd"><pre><span class="c">id  usuario     hash</span>
+1   usuario_a   5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+2   usuario_b   7c4a8d09ca3762af61e59520943dc26494f8941b
+3   usuario_c   5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+
+<span class="c">sal declarada por la fábrica de software: constante "c00pab2019" para todos los registros</span></pre></div>
+
+  <div class="adv"><b>Dos observaciones saltan de inmediato</b>, y las dos dicen algo grave. La primera es la longitud. La segunda es que dos usuarios distintos tienen exactamente el mismo resumen. Escriban qué significa cada una <b>antes</b> de pasar al ejercicio 2.</div>
+</section>
+
+<!-- ───────────── EJERCICIO 2 ───────────── -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 20 minutos</div><h2>Reproducir el cálculo</h2></div>
+  <p class="lead">Las contraseñas del ejemplo son las dos más genéricas que existen, las de cualquier manual de seguridad. El objetivo no es adivinarlas: es <b>comprobar en cuál de tres condiciones</b> el resumen de la evidencia se reproduce, porque eso revela si la sal declarada se aplicó o solo está documentada.</p>
+
+  <div class="panel inter">
+    <div class="et">Reproducir el cálculo con candidatas</div>
+    <div class="et" style="margin-top:10px;color:var(--gris)">Candidatas, separadas por espacios. Ya vienen las dos genéricas; agreguen las suyas.</div>
+    <textarea id="e2cand" spellcheck="false">password 123456</textarea>
+    <div class="fila">
+      <button id="e2go">Calcular las tres condiciones</button>
+      <span class="leyenda" style="margin:0" id="e2n">—</span>
+    </div>
+    <div class="sal" id="e2s">Pulse el botón. Todo se calcula en su navegador.</div>
+  </div>
+
+  <div class="tres" style="margin-top:14px">
+    <div class="tarj fill"><h4>Condición 1</h4><p>El resumen de la candidata sola, sin ninguna sal.</p></div>
+    <div class="tarj fill"><h4>Condición 2</h4><p>El resumen de la candidata con la sal declarada <b>detrás</b>.</p></div>
+    <div class="tarj fill"><h4>Condición 3</h4><p>El resumen de la candidata con la sal declarada <b>delante</b>.</p></div>
+  </div>
+  <div class="leyenda">Si la sal se aplicara, coincidiría la condición 2 o la 3. Que coincida la <b>1</b> demuestra que la sal declarada no se está usando: es un hallazgo con nombre propio.</div>
+
+  <div class="cmd-t">Lo mismo desde la línea de comandos, para verificar a mano</div>
+  <div class="cmd"><pre>echo -n "password"            | openssl dgst -sha1
+echo -n "passwordc00pab2019"  | openssl dgst -sha1
+echo -n "c00pab2019password"  | openssl dgst -sha1</pre></div>
+
+  <div class="cmd-t">Y en Python, que es como va en el informe</div>
+  <div class="cmd"><pre><span class="n">import</span> hashlib
+
+objetivo = <span class="n">"5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"</span>      <span class="c"># usuario_a y usuario_c</span>
+candidata = <span class="n">"password"</span>
+sal = <span class="n">"c00pab2019"</span>
+
+sin_sal  = hashlib.sha1(candidata.encode()).hexdigest()
+con_sal  = hashlib.sha1((candidata + sal).encode()).hexdigest()
+sal_ante = hashlib.sha1((sal + candidata).encode()).hexdigest()
+
+<span class="n">for</span> nombre, valor <span class="n">in</span> [(<span class="n">"sin sal"</span>, sin_sal), (<span class="n">"sal detras"</span>, con_sal), (<span class="n">"sal delante"</span>, sal_ante)]:
+    <span class="n">if</span> valor == objetivo:
+        print(<span class="n">"coincide con:"</span>, nombre)</pre></div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>En cuál de las tres condiciones coincidió cada resumen.</li>
+      <li>Qué les dijo el hecho de que dos usuarios compartieran resumen, antes de calcular nada.</li>
+      <li><b>La discrepancia.</b> La documentación de la fábrica de software afirma una cosa; los datos demuestran otra. Escríbanla como la escribiría un auditor: qué se afirma, qué se comprueba, y qué habría que revisar para confirmarlo en la base real y no solo en la muestra.</li>
+    </ul>
+  </div>
+
+  <details><summary>Cómo se escribe una discrepancia sin acusar a nadie</summary>
+    <p>Un hallazgo de auditoría no dice «mintieron». Dice qué afirma la fuente, qué muestra la evidencia y qué falta por verificar. Por ejemplo: <i>«La documentación del proveedor declara una sal constante aplicada a todos los registros. Sobre la muestra entregada, los resúmenes se reproducen sin sal. No es posible determinar con esta muestra si la sal se omite en toda la base o solo en estos registros; se requiere revisar el código de registro y de cambio de contraseña.»</i></p>
+    <p>Esa última frase —lo que falta por verificar— es la que separa un informe utilizable de una acusación.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 3 ───────────── -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Medir la diferencia</h2></div>
+  <p class="lead">Calculen cuánto tarda una función de derivación moderna frente a un resumen simple para el mismo intento, y extrapolen: ¿cuánto costaría revisar las 142.000 cuentas en cada esquema?</p>
+
+  <div class="panel inter">
+    <div class="et">Calculadora del costo</div>
+    <div class="fila">
+      <label for="e3n">Tamaño del recorrido</label>
+      <select id="e3n" style="width:auto">
+        <option value="1000000">1 millón de candidatas</option>
+        <option value="10000000" selected>10 millones de candidatas</option>
+        <option value="100000000">100 millones de candidatas</option>
+      </select>
+      <label for="e3i">Iteraciones de la derivación</label>
+      <select id="e3i" style="width:auto">
+        <option value="1000">1.000</option>
+        <option value="100000">100.000</option>
+        <option value="600000" selected>600.000</option>
+      </select>
+      <button id="e3go">Medir y extrapolar</button>
+    </div>
+    <div class="sal" id="e3s">—</div>
+    <div class="leyenda">Las velocidades son las de este navegador, que es de los peores instrumentos posibles para esta tarea. La conclusión no cambia con un instrumento mejor; cambia de escala.</div>
+  </div>
+
+  <details><summary>Las dos cosas que está midiendo esta calculadora, y que conviene no confundir</summary>
+    <p><b>El factor de trabajo</b> decide cuánto cuesta cada intento. Un resumen simple está diseñado para ser rápido —es lo que se le pide a un resumen— y por eso es pésimo para guardar contraseñas. Una función de derivación está diseñada para ser lenta a propósito, y esa lentitud es la defensa.</p>
+    <p><b>La sal única por usuario</b> decide cuántas veces hay que pagar ese costo. Sin sal, o con una sal constante, el recorrido se hace <b>una sola vez</b> y sirve para las 142.000 cuentas a la vez. Con una sal distinta por usuario, hay que repetir el recorrido entero <b>una vez por cuenta</b>. Ese factor de 142.000 no lo aporta el algoritmo: lo aporta el diseño.</p>
+  </details>
+
+  <div class="cmd-t">La medición en Python, con scrypt de la biblioteca estándar</div>
+  <div class="cmd"><pre><span class="n">import</span> hashlib, time
+
+t = time.perf_counter()
+hashlib.scrypt(b<span class="n">"candidata"</span>, salt=b<span class="n">"sal-unica-16-bytes"</span>, n=2**14, r=8, p=1)
+print(round(time.perf_counter() - t, 3), <span class="n">"segundos por intento"</span>)</pre></div>
+</section>
+
+<!-- ───────────── REPASO ───────────── -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué falló en cada caso?</h2></div>
+  <p class="lead">Seis situaciones. Elijan la causa principal, la que habría evitado el problema.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ───────────── ENTREGA ───────────── -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo al final del bloque. Se evalúa el análisis, no el resultado.</p>
+  <ul class="chk">
+    <li>Qué función produjo los resúmenes y con qué argumento lo sostienen.</li>
+    <li>Qué significaba, antes de calcular nada, que dos usuarios compartieran resumen.</li>
+    <li>La condición en que se reprodujo cada resumen.</li>
+    <li>La discrepancia entre la documentación y los datos, redactada como hallazgo.</li>
+    <li>La tabla de costos del ejercicio 3, con las dos filas: sin sal y con sal única por usuario.</li>
+    <li>Una frase: de las tres cosas que están mal en el hallazgo H1 —la función, la sal y la política de contraseñas—, ¿cuál arreglarían primero y por qué?</li>
+  </ul>
+  <div class="adv"><b>Regla de trabajo del módulo.</b> No peguen la evidencia B ni sus resultados en sitios en línea de terceros. Existen páginas que ofrecen «revelar» un resumen pegándolo en una caja: lo que hacen es quedarse con lo que usted les pegó.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 3</span>
+</footer>
+</div>
+
+<script>
+/* ═════════ Datos del caso ═════════ */
+const EVID = {
+  "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8": "usuario_a y usuario_c",
+  "7c4a8d09ca3762af61e59520943dc26494f8941b": "usuario_b"
+};
+const SAL = "c00pab2019";
+
+async function sha(nombre, txt){
+  const b = await crypto.subtle.digest(nombre, bytes(txt));
+  return hex(b);
+}
+
+/* ═════════ Demostración · efecto avalancha ═════════ */
+async function pintaD1(){
+  const f = $("d1f").value;
+  const ha = await sha(f, $("d1a").value), hb = await sha(f, $("d1b").value);
+  $("d1ha").textContent = bloques(ha, 4);
+  $("d1hb").textContent = bloques(hb, 4);
+  let iguales = 0;
+  for (let i = 0; i < Math.min(ha.length, hb.length); i++) if (ha[i] === hb[i]) iguales++;
+  const pct = Math.round(100 * iguales / ha.length);
+  $("d1d").textContent = "coinciden " + pct + " % de los dígitos, lo mismo que dos resúmenes al azar";
+}
+["d1a", "d1b", "d1f"].forEach(id => $(id).addEventListener("input", pintaD1));
+pintaD1();
+
+/* ═════════ Ejercicio 1 · identificar por longitud ═════════ */
+const PORBITS = { 128: "MD5 (128 bits) — roto, no debería aparecer nunca",
+                  160: "SHA-1 (160 bits) — obsoleto para contraseñas",
+                  224: "SHA-224", 256: "SHA-256", 384: "SHA-384", 512: "SHA-512" };
+$("e1go").addEventListener("click", function(){
+  const h = $("e1h").value.replace(/[^0-9a-fA-F]/g, "");
+  const bits = h.length * 4;
+  const cual = PORBITS[bits];
+  $("e1s").textContent =
+    "dígitos hexadecimales : " + h.length + "\n" +
+    "bits                  : " + bits + "\n" +
+    "función más probable  : " + (cual || "longitud no estándar") + "\n\n" +
+    (bits === 160
+      ? "160 bits es SHA-1. Para un resumen de contraseñas es una mala elección:\nes rápido de calcular y no lleva factor de trabajo."
+      : "Compare con los otros resúmenes de la evidencia: si todos miden lo mismo,\ntodos salieron de la misma función.");
+});
+
+/* ═════════ Ejercicio 2 · reproducir el cálculo ═════════ */
+$("e2go").addEventListener("click", async function(){
+  const cand = ($("e2cand").value.match(/\S+/g) || []);
+  if (!cand.length){ $("e2s").textContent = "Escriba al menos una candidata."; return; }
+  const lineas = [];
+  let hallazgos = 0;
+  for (const c of cand){
+    const c1 = await sha("SHA-1", c);
+    const c2 = await sha("SHA-1", c + SAL);
+    const c3 = await sha("SHA-1", SAL + c);
+    const marca = h => EVID[h] ? "  ← coincide con " + EVID[h] : "";
+    if (EVID[c1] || EVID[c2] || EVID[c3]) hallazgos++;
+    lineas.push('"' + c + '"');
+    lineas.push("  1 · sin sal      " + c1 + marca(c1));
+    lineas.push("  2 · sal detras   " + c2 + marca(c2));
+    lineas.push("  3 · sal delante  " + c3 + marca(c3));
+    lineas.push("");
+  }
+  lineas.push(hallazgos
+    ? "Las coincidencias caen en la CONDICIÓN 1: la sal declarada no se aplicó."
+    : "Ninguna candidata coincidió. Agregue otras y vuelva a intentar.");
+  $("e2s").textContent = lineas.join("\n");
+  $("e2n").textContent = cand.length + " candidata(s) · 3 condiciones";
+});
+
+/* ═════════ Ejercicio 3 · costo del recorrido ═════════ */
+async function velocidadSHA1(){
+  const muestra = "candidata-de-prueba";
+  const t = performance.now();
+  const N = 2000;
+  for (let i = 0; i < N; i++) await crypto.subtle.digest("SHA-1", bytes(muestra + i));
+  return N / ((performance.now() - t) / 1000);       // intentos por segundo
+}
+async function costoDerivacion(iter){
+  const base = await crypto.subtle.importKey("raw", bytes("candidata"), "PBKDF2", false, ["deriveBits"]);
+  const t = performance.now();
+  await crypto.subtle.deriveBits({ name: "PBKDF2", salt: bytes("sal"), iterations: iter, hash: "SHA-256" }, base, 256);
+  return performance.now() - t;                       // ms por intento
+}
+function duracion(seg){
+  if (seg < 60) return seg.toFixed(1) + " s";
+  if (seg < 3600) return (seg / 60).toFixed(1) + " min";
+  if (seg < 86400) return (seg / 3600).toFixed(1) + " h";
+  if (seg < 31557600) return (seg / 86400).toFixed(1) + " días";
+  return (seg / 31557600).toFixed(1) + " años";
+}
+$("e3go").addEventListener("click", async function(){
+  const N = parseInt($("e3n").value, 10), iter = parseInt($("e3i").value, 10);
+  $("e3s").textContent = "midiendo la velocidad de este navegador…";
+  const vSimple = await velocidadSHA1();
+  const msDeriv = await costoDerivacion(iter);
+  const vDeriv = 1000 / msDeriv;
+  const cuentas = 142000;
+  $("e3s").textContent =
+    "velocidad medida en este navegador\n" +
+    "  resumen SHA-1 simple : " + Math.round(vSimple).toLocaleString("es-CO") + " intentos/s\n" +
+    "  derivación " + iter.toLocaleString("es-CO") + " it. : " + vDeriv.toFixed(1) + " intentos/s\n\n" +
+    "recorrer " + N.toLocaleString("es-CO") + " candidatas UNA vez\n" +
+    "  con SHA-1 simple     : " + duracion(N / vSimple) + "\n" +
+    "  con la derivación    : " + duracion(N / vDeriv) + "\n\n" +
+    "y ahora la sal: sin sal única, ese recorrido sirve para las " + cuentas.toLocaleString("es-CO") + " cuentas a la vez.\n" +
+    "con sal única por usuario, hay que repetirlo una vez por cuenta:\n" +
+    "  SHA-1 simple × " + cuentas.toLocaleString("es-CO") + " cuentas : " + duracion(N / vSimple * cuentas) + "\n" +
+    "  derivación × " + cuentas.toLocaleString("es-CO") + " cuentas   : " + duracion(N / vDeriv * cuentas);
+});
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["La tabla guarda el resumen SHA-1 de la contraseña, sin ningún factor de trabajo.",
+  "Función sin costo", "SHA-1 es rápido por diseño. Para contraseñas hay que usar una función de derivación lenta: bcrypt, scrypt o Argon2."],
+ ["Dos usuarios distintos tienen exactamente el mismo resumen en la tabla.",
+  "Falta de sal única", "Con una sal distinta por usuario, dos contraseñas iguales darían resúmenes distintos. Que coincidan delata que la sal no es única, o que no hay."],
+ ["La documentación declara una sal constante, pero los resúmenes se reproducen sin ella.",
+  "Sal declarada, no aplicada", "Es el hallazgo de auditoría: lo documentado y lo implementado no coinciden. Se reporta como discrepancia, no como acusación."],
+ ["La política del portal permite contraseñas de seis caracteres y no obliga a cambiarlas.",
+  "Política débil", "Ninguna función de derivación compensa una contraseña de seis caracteres. La política es la primera línea, y aquí no existe."],
+ ["Alguien pega el resumen en una página que promete revelarlo, y funciona al instante.",
+  "Resumen ya conocido", "Esas páginas no descifran: buscan en una tabla de resúmenes ya calculados. Contra un resumen sin sal de una contraseña común, la respuesta es inmediata."],
+ ["El área quiere cifrar las contraseñas para poder recuperarlas y enviárselas al usuario que las olvidó.",
+  "Error de concepto", "Las contraseñas no se cifran para recuperarlas: se resumen con derivación, y lo que se recupera es el acceso mediante un restablecimiento. Si el sistema puede devolver la contraseña, alguien más también."]
+], ["Función sin costo", "Falta de sal única", "Sal declarada, no aplicada", "Política débil", "Resumen ya conocido", "Error de concepto"], "qver", "qreset", "qmarca");
+</script>
+
+</body>
+</html>

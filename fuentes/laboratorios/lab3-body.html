@@ -1,0 +1,315 @@
+<!-- titulo: Laboratorio 3 · SIO0010 Técnicas Criptográficas -->
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 3 · Sesión 3</div>
+  <h1>Auditar la evidencia B</h1>
+  <p class="lead">Cincuenta minutos. Trabajan sobre la muestra de la tabla de usuarios del caso. Está anonimizada: los usuarios no existen y las contraseñas del ejemplo son las genéricas de manual, pero <b>los resúmenes se comportan como los de la base de Coopaburrá</b>.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que reproduzcan un resumen. Se evalúa que expliquen <b>qué propiedad del esquema lo hace débil</b>, y que documenten la discrepancia entre lo que la documentación afirma y lo que los datos demuestran. Eso último es, literalmente, el trabajo de un auditor.</div>
+</header>
+
+<nav class="nav">
+  <a href="#d1">Demo · Efecto avalancha</a>
+  <a href="#e1">Ejercicio 1 · Qué función es</a>
+  <a href="#e2">Ejercicio 2 · Reproducir el cálculo</a>
+  <a href="#e3">Ejercicio 3 · Medir el costo</a>
+  <a href="#e4">Repaso</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- ───────────── DEMO ───────────── -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración · 5 minutos</div><h2>Un resumen no se parece a su entrada</h2></div>
+  <p class="lead">Escriba en el primer recuadro y cambie <b>una sola letra</b> en el segundo. Los dos resúmenes no se parecen en nada: esa es la propiedad que hace útil a una función de resumen, y también la que hace inútil compararlas «por parecido».</p>
+  <div class="panel inter">
+    <div class="dos">
+      <div><div class="et">Entrada A</div><textarea id="d1a" spellcheck="false">Transferencia por 100000 aprobada</textarea><div class="sal" id="d1ha" style="margin-top:8px">—</div></div>
+      <div><div class="et">Entrada B</div><textarea id="d1b" spellcheck="false">Transferencia por 900000 aprobada</textarea><div class="sal" id="d1hb" style="margin-top:8px">—</div></div>
+    </div>
+    <div class="fila"><label for="d1f">Función</label>
+      <select id="d1f" style="width:auto"><option>SHA-256</option><option>SHA-1</option><option>SHA-384</option><option>SHA-512</option></select>
+      <span class="leyenda" style="margin:0" id="d1d">—</span>
+    </div>
+  </div>
+  <details><summary>Por qué esto no protege una contraseña</summary>
+    <p>Que el resumen cambie por completo con un solo bit no protege una contraseña. Quien quiera averiguarla no intenta parecerse: <b>reproduce el cálculo</b> con una candidata y compara. La única defensa real es que cada intento cueste tiempo, y eso no lo da la función de resumen: lo da el factor de trabajo de una función de derivación, que es el ejercicio 3.</p>
+    <p>La segunda defensa es que el resultado de un intento no sirva para dos cuentas. Eso lo da <b>una sal distinta por usuario</b>. Una sal constante para toda la base —como la que declara la documentación de Coopaburrá— no aporta eso: solo obliga a rehacer el cálculo una vez más, con esa sal.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 1 ───────────── -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 10 minutos</div><h2>Identificar la función sin ver el código</h2></div>
+  <p class="lead">A partir de la longitud del resumen, determinen qué función lo produjo. Justifiquen con el número de bits, no con la apariencia.</p>
+
+  <div class="panel inter">
+    <div class="et">Analizador de resúmenes</div>
+    <input type="text" id="e1h" value="5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8" spellcheck="false">
+    <div class="fila"><button id="e1go">Analizar</button><span class="leyenda" style="margin:0">Pegue cualquiera de los resúmenes de la evidencia B</span></div>
+    <div class="sal" id="e1s">—</div>
+  </div>
+
+  <h3>La evidencia B, tal como está en el expediente</h3>
+  <div class="cmd"><pre><span class="c">id  usuario     hash</span>
+1   usuario_a   5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+2   usuario_b   7c4a8d09ca3762af61e59520943dc26494f8941b
+3   usuario_c   5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+
+<span class="c">sal declarada por la fábrica de software: constante "c00pab2019" para todos los registros</span></pre></div>
+
+  <div class="adv"><b>Dos observaciones saltan de inmediato</b>, y las dos dicen algo grave. La primera es la longitud. La segunda es que dos usuarios distintos tienen exactamente el mismo resumen. Escriban qué significa cada una <b>antes</b> de pasar al ejercicio 2.</div>
+</section>
+
+<!-- ───────────── EJERCICIO 2 ───────────── -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 20 minutos</div><h2>Reproducir el cálculo</h2></div>
+  <p class="lead">Las contraseñas del ejemplo son las dos más genéricas que existen, las de cualquier manual de seguridad. El objetivo no es adivinarlas: es <b>comprobar en cuál de tres condiciones</b> el resumen de la evidencia se reproduce, porque eso revela si la sal declarada se aplicó o solo está documentada.</p>
+
+  <div class="panel inter">
+    <div class="et">Reproducir el cálculo con candidatas</div>
+    <div class="et" style="margin-top:10px;color:var(--gris)">Candidatas, separadas por espacios. Ya vienen las dos genéricas; agreguen las suyas.</div>
+    <textarea id="e2cand" spellcheck="false">password 123456</textarea>
+    <div class="fila">
+      <button id="e2go">Calcular las tres condiciones</button>
+      <span class="leyenda" style="margin:0" id="e2n">—</span>
+    </div>
+    <div class="sal" id="e2s">Pulse el botón. Todo se calcula en su navegador.</div>
+  </div>
+
+  <div class="tres" style="margin-top:14px">
+    <div class="tarj fill"><h4>Condición 1</h4><p>El resumen de la candidata sola, sin ninguna sal.</p></div>
+    <div class="tarj fill"><h4>Condición 2</h4><p>El resumen de la candidata con la sal declarada <b>detrás</b>.</p></div>
+    <div class="tarj fill"><h4>Condición 3</h4><p>El resumen de la candidata con la sal declarada <b>delante</b>.</p></div>
+  </div>
+  <div class="leyenda">Si la sal se aplicara, coincidiría la condición 2 o la 3. Que coincida la <b>1</b> demuestra que la sal declarada no se está usando: es un hallazgo con nombre propio.</div>
+
+  <div class="cmd-t">Lo mismo desde la línea de comandos, para verificar a mano</div>
+  <div class="cmd"><pre>echo -n "password"            | openssl dgst -sha1
+echo -n "passwordc00pab2019"  | openssl dgst -sha1
+echo -n "c00pab2019password"  | openssl dgst -sha1</pre></div>
+
+  <div class="cmd-t">Y en Python, que es como va en el informe</div>
+  <div class="cmd"><pre><span class="n">import</span> hashlib
+
+objetivo = <span class="n">"5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"</span>      <span class="c"># usuario_a y usuario_c</span>
+candidata = <span class="n">"password"</span>
+sal = <span class="n">"c00pab2019"</span>
+
+sin_sal  = hashlib.sha1(candidata.encode()).hexdigest()
+con_sal  = hashlib.sha1((candidata + sal).encode()).hexdigest()
+sal_ante = hashlib.sha1((sal + candidata).encode()).hexdigest()
+
+<span class="n">for</span> nombre, valor <span class="n">in</span> [(<span class="n">"sin sal"</span>, sin_sal), (<span class="n">"sal detras"</span>, con_sal), (<span class="n">"sal delante"</span>, sal_ante)]:
+    <span class="n">if</span> valor == objetivo:
+        print(<span class="n">"coincide con:"</span>, nombre)</pre></div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>En cuál de las tres condiciones coincidió cada resumen.</li>
+      <li>Qué les dijo el hecho de que dos usuarios compartieran resumen, antes de calcular nada.</li>
+      <li><b>La discrepancia.</b> La documentación de la fábrica de software afirma una cosa; los datos demuestran otra. Escríbanla como la escribiría un auditor: qué se afirma, qué se comprueba, y qué habría que revisar para confirmarlo en la base real y no solo en la muestra.</li>
+    </ul>
+  </div>
+
+  <details><summary>Cómo se escribe una discrepancia sin acusar a nadie</summary>
+    <p>Un hallazgo de auditoría no dice «mintieron». Dice qué afirma la fuente, qué muestra la evidencia y qué falta por verificar. Por ejemplo: <i>«La documentación del proveedor declara una sal constante aplicada a todos los registros. Sobre la muestra entregada, los resúmenes se reproducen sin sal. No es posible determinar con esta muestra si la sal se omite en toda la base o solo en estos registros; se requiere revisar el código de registro y de cambio de contraseña.»</i></p>
+    <p>Esa última frase —lo que falta por verificar— es la que separa un informe utilizable de una acusación.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 3 ───────────── -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Medir la diferencia</h2></div>
+  <p class="lead">Calculen cuánto tarda una función de derivación moderna frente a un resumen simple para el mismo intento, y extrapolen: ¿cuánto costaría revisar las 142.000 cuentas en cada esquema?</p>
+
+  <div class="panel inter">
+    <div class="et">Calculadora del costo</div>
+    <div class="fila">
+      <label for="e3n">Tamaño del recorrido</label>
+      <select id="e3n" style="width:auto">
+        <option value="1000000">1 millón de candidatas</option>
+        <option value="10000000" selected>10 millones de candidatas</option>
+        <option value="100000000">100 millones de candidatas</option>
+      </select>
+      <label for="e3i">Iteraciones de la derivación</label>
+      <select id="e3i" style="width:auto">
+        <option value="1000">1.000</option>
+        <option value="100000">100.000</option>
+        <option value="600000" selected>600.000</option>
+      </select>
+      <button id="e3go">Medir y extrapolar</button>
+    </div>
+    <div class="sal" id="e3s">—</div>
+    <div class="leyenda">Las velocidades son las de este navegador, que es de los peores instrumentos posibles para esta tarea. La conclusión no cambia con un instrumento mejor; cambia de escala.</div>
+  </div>
+
+  <details><summary>Las dos cosas que está midiendo esta calculadora, y que conviene no confundir</summary>
+    <p><b>El factor de trabajo</b> decide cuánto cuesta cada intento. Un resumen simple está diseñado para ser rápido —es lo que se le pide a un resumen— y por eso es pésimo para guardar contraseñas. Una función de derivación está diseñada para ser lenta a propósito, y esa lentitud es la defensa.</p>
+    <p><b>La sal única por usuario</b> decide cuántas veces hay que pagar ese costo. Sin sal, o con una sal constante, el recorrido se hace <b>una sola vez</b> y sirve para las 142.000 cuentas a la vez. Con una sal distinta por usuario, hay que repetir el recorrido entero <b>una vez por cuenta</b>. Ese factor de 142.000 no lo aporta el algoritmo: lo aporta el diseño.</p>
+  </details>
+
+  <div class="cmd-t">La medición en Python, con scrypt de la biblioteca estándar</div>
+  <div class="cmd"><pre><span class="n">import</span> hashlib, time
+
+t = time.perf_counter()
+hashlib.scrypt(b<span class="n">"candidata"</span>, salt=b<span class="n">"sal-unica-16-bytes"</span>, n=2**14, r=8, p=1)
+print(round(time.perf_counter() - t, 3), <span class="n">"segundos por intento"</span>)</pre></div>
+</section>
+
+<!-- ───────────── REPASO ───────────── -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué falló en cada caso?</h2></div>
+  <p class="lead">Seis situaciones. Elijan la causa principal, la que habría evitado el problema.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ───────────── ENTREGA ───────────── -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo al final del bloque. Se evalúa el análisis, no el resultado.</p>
+  <ul class="chk">
+    <li>Qué función produjo los resúmenes y con qué argumento lo sostienen.</li>
+    <li>Qué significaba, antes de calcular nada, que dos usuarios compartieran resumen.</li>
+    <li>La condición en que se reprodujo cada resumen.</li>
+    <li>La discrepancia entre la documentación y los datos, redactada como hallazgo.</li>
+    <li>La tabla de costos del ejercicio 3, con las dos filas: sin sal y con sal única por usuario.</li>
+    <li>Una frase: de las tres cosas que están mal en el hallazgo H1 —la función, la sal y la política de contraseñas—, ¿cuál arreglarían primero y por qué?</li>
+  </ul>
+  <div class="adv"><b>Regla de trabajo del módulo.</b> No peguen la evidencia B ni sus resultados en sitios en línea de terceros. Existen páginas que ofrecen «revelar» un resumen pegándolo en una caja: lo que hacen es quedarse con lo que usted les pegó.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 3</span>
+</footer>
+</div>
+
+<script>
+/* ═════════ Datos del caso ═════════ */
+const EVID = {
+  "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8": "usuario_a y usuario_c",
+  "7c4a8d09ca3762af61e59520943dc26494f8941b": "usuario_b"
+};
+const SAL = "c00pab2019";
+
+async function sha(nombre, txt){
+  const b = await crypto.subtle.digest(nombre, bytes(txt));
+  return hex(b);
+}
+
+/* ═════════ Demostración · efecto avalancha ═════════ */
+async function pintaD1(){
+  const f = $("d1f").value;
+  const ha = await sha(f, $("d1a").value), hb = await sha(f, $("d1b").value);
+  $("d1ha").textContent = bloques(ha, 4);
+  $("d1hb").textContent = bloques(hb, 4);
+  let iguales = 0;
+  for (let i = 0; i < Math.min(ha.length, hb.length); i++) if (ha[i] === hb[i]) iguales++;
+  const pct = Math.round(100 * iguales / ha.length);
+  $("d1d").textContent = "coinciden " + pct + " % de los dígitos, lo mismo que dos resúmenes al azar";
+}
+["d1a", "d1b", "d1f"].forEach(id => $(id).addEventListener("input", pintaD1));
+pintaD1();
+
+/* ═════════ Ejercicio 1 · identificar por longitud ═════════ */
+const PORBITS = { 128: "MD5 (128 bits) — roto, no debería aparecer nunca",
+                  160: "SHA-1 (160 bits) — obsoleto para contraseñas",
+                  224: "SHA-224", 256: "SHA-256", 384: "SHA-384", 512: "SHA-512" };
+$("e1go").addEventListener("click", function(){
+  const h = $("e1h").value.replace(/[^0-9a-fA-F]/g, "");
+  const bits = h.length * 4;
+  const cual = PORBITS[bits];
+  $("e1s").textContent =
+    "dígitos hexadecimales : " + h.length + "\n" +
+    "bits                  : " + bits + "\n" +
+    "función más probable  : " + (cual || "longitud no estándar") + "\n\n" +
+    (bits === 160
+      ? "160 bits es SHA-1. Para un resumen de contraseñas es una mala elección:\nes rápido de calcular y no lleva factor de trabajo."
+      : "Compare con los otros resúmenes de la evidencia: si todos miden lo mismo,\ntodos salieron de la misma función.");
+});
+
+/* ═════════ Ejercicio 2 · reproducir el cálculo ═════════ */
+$("e2go").addEventListener("click", async function(){
+  const cand = ($("e2cand").value.match(/\S+/g) || []);
+  if (!cand.length){ $("e2s").textContent = "Escriba al menos una candidata."; return; }
+  const lineas = [];
+  let hallazgos = 0;
+  for (const c of cand){
+    const c1 = await sha("SHA-1", c);
+    const c2 = await sha("SHA-1", c + SAL);
+    const c3 = await sha("SHA-1", SAL + c);
+    const marca = h => EVID[h] ? "  ← coincide con " + EVID[h] : "";
+    if (EVID[c1] || EVID[c2] || EVID[c3]) hallazgos++;
+    lineas.push('"' + c + '"');
+    lineas.push("  1 · sin sal      " + c1 + marca(c1));
+    lineas.push("  2 · sal detras   " + c2 + marca(c2));
+    lineas.push("  3 · sal delante  " + c3 + marca(c3));
+    lineas.push("");
+  }
+  lineas.push(hallazgos
+    ? "Las coincidencias caen en la CONDICIÓN 1: la sal declarada no se aplicó."
+    : "Ninguna candidata coincidió. Agregue otras y vuelva a intentar.");
+  $("e2s").textContent = lineas.join("\n");
+  $("e2n").textContent = cand.length + " candidata(s) · 3 condiciones";
+});
+
+/* ═════════ Ejercicio 3 · costo del recorrido ═════════ */
+async function velocidadSHA1(){
+  const muestra = "candidata-de-prueba";
+  const t = performance.now();
+  const N = 2000;
+  for (let i = 0; i < N; i++) await crypto.subtle.digest("SHA-1", bytes(muestra + i));
+  return N / ((performance.now() - t) / 1000);       // intentos por segundo
+}
+async function costoDerivacion(iter){
+  const base = await crypto.subtle.importKey("raw", bytes("candidata"), "PBKDF2", false, ["deriveBits"]);
+  const t = performance.now();
+  await crypto.subtle.deriveBits({ name: "PBKDF2", salt: bytes("sal"), iterations: iter, hash: "SHA-256" }, base, 256);
+  return performance.now() - t;                       // ms por intento
+}
+function duracion(seg){
+  if (seg < 60) return seg.toFixed(1) + " s";
+  if (seg < 3600) return (seg / 60).toFixed(1) + " min";
+  if (seg < 86400) return (seg / 3600).toFixed(1) + " h";
+  if (seg < 31557600) return (seg / 86400).toFixed(1) + " días";
+  return (seg / 31557600).toFixed(1) + " años";
+}
+$("e3go").addEventListener("click", async function(){
+  const N = parseInt($("e3n").value, 10), iter = parseInt($("e3i").value, 10);
+  $("e3s").textContent = "midiendo la velocidad de este navegador…";
+  const vSimple = await velocidadSHA1();
+  const msDeriv = await costoDerivacion(iter);
+  const vDeriv = 1000 / msDeriv;
+  const cuentas = 142000;
+  $("e3s").textContent =
+    "velocidad medida en este navegador\n" +
+    "  resumen SHA-1 simple : " + Math.round(vSimple).toLocaleString("es-CO") + " intentos/s\n" +
+    "  derivación " + iter.toLocaleString("es-CO") + " it. : " + vDeriv.toFixed(1) + " intentos/s\n\n" +
+    "recorrer " + N.toLocaleString("es-CO") + " candidatas UNA vez\n" +
+    "  con SHA-1 simple     : " + duracion(N / vSimple) + "\n" +
+    "  con la derivación    : " + duracion(N / vDeriv) + "\n\n" +
+    "y ahora la sal: sin sal única, ese recorrido sirve para las " + cuentas.toLocaleString("es-CO") + " cuentas a la vez.\n" +
+    "con sal única por usuario, hay que repetirlo una vez por cuenta:\n" +
+    "  SHA-1 simple × " + cuentas.toLocaleString("es-CO") + " cuentas : " + duracion(N / vSimple * cuentas) + "\n" +
+    "  derivación × " + cuentas.toLocaleString("es-CO") + " cuentas   : " + duracion(N / vDeriv * cuentas);
+});
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["La tabla guarda el resumen SHA-1 de la contraseña, sin ningún factor de trabajo.",
+  "Función sin costo", "SHA-1 es rápido por diseño. Para contraseñas hay que usar una función de derivación lenta: bcrypt, scrypt o Argon2."],
+ ["Dos usuarios distintos tienen exactamente el mismo resumen en la tabla.",
+  "Falta de sal única", "Con una sal distinta por usuario, dos contraseñas iguales darían resúmenes distintos. Que coincidan delata que la sal no es única, o que no hay."],
+ ["La documentación declara una sal constante, pero los resúmenes se reproducen sin ella.",
+  "Sal declarada, no aplicada", "Es el hallazgo de auditoría: lo documentado y lo implementado no coinciden. Se reporta como discrepancia, no como acusación."],
+ ["La política del portal permite contraseñas de seis caracteres y no obliga a cambiarlas.",
+  "Política débil", "Ninguna función de derivación compensa una contraseña de seis caracteres. La política es la primera línea, y aquí no existe."],
+ ["Alguien pega el resumen en una página que promete revelarlo, y funciona al instante.",
+  "Resumen ya conocido", "Esas páginas no descifran: buscan en una tabla de resúmenes ya calculados. Contra un resumen sin sal de una contraseña común, la respuesta es inmediata."],
+ ["El área quiere cifrar las contraseñas para poder recuperarlas y enviárselas al usuario que las olvidó.",
+  "Error de concepto", "Las contraseñas no se cifran para recuperarlas: se resumen con derivación, y lo que se recupera es el acceso mediante un restablecimiento. Si el sistema puede devolver la contraseña, alguien más también."]
+], ["Función sin costo", "Falta de sal única", "Sal declarada, no aplicada", "Política débil", "Resumen ya conocido", "Error de concepto"], "qver", "qreset", "qmarca");
+</script>

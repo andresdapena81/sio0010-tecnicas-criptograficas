@@ -1,0 +1,367 @@
+<!-- titulo: Laboratorio 2 · SIO0010 Técnicas Criptográficas -->
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 2 · Sesión 2</div>
+  <h1>Modos de operación y la línea de Coopaburrá</h1>
+  <p class="lead">Cincuenta y cinco minutos. Las demostraciones corren en su navegador, sin conexión y sin instalar nada. Los ejercicios 1 y 3 se hacen con OpenSSL o con Python en su máquina: los comandos están aquí, con botón de copiar.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que los comandos funcionen. Se evalúa que expliquen <b>qué propiedad del modo permitió —o impidió— el ataque</b>. Un ejercicio que corrió sin explicación vale la mitad que uno que falló con el diagnóstico correcto.</div>
+</header>
+
+<nav class="nav">
+  <a href="#d1">Demo · Lo que ECB no esconde</a>
+  <a href="#e1">Ejercicio 1 · El escudo</a>
+  <a href="#e2">Ejercicio 2 · Alterar un byte</a>
+  <a href="#e3">Ejercicio 3 · La evidencia C</a>
+  <a href="#e4">Repaso · Qué modo</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- ───────────── DEMO 1 ───────────── -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración · 5 minutos</div><h2>Lo que ECB no esconde</h2></div>
+  <p class="lead">El escudo de la Institución, aplanado a dos colores y cifrado con <b>AES-256</b> y una llave de 256 bits generada al azar. Se cifraron los bytes de los píxeles, no el archivo: por eso el resultado sigue siendo una imagen. Lo único que cambia entre las dos versiones cifradas es el modo de operación.</p>
+  <div class="imgs">
+    <figure><img src="data:image/png;base64,MEDIA(escudo-original.png)" alt="Escudo original"><figcaption>Original<br>sin cifrar</figcaption></figure>
+    <figure><img src="data:image/png;base64,MEDIA(escudo-ecb.png)" alt="Escudo cifrado en ECB"><figcaption>AES-256<br>modo ECB</figcaption></figure>
+    <figure><img src="data:image/png;base64,MEDIA(escudo-ctr.png)" alt="Escudo cifrado en CTR"><figcaption>AES-256<br>modo CTR</figcaption></figure>
+  </div>
+
+  <h3>Y ahora con datos, que es donde duele</h3>
+  <p>Una imagen impresiona, pero el problema real está en los registros. Este texto tiene cuatro bloques de dieciséis caracteres y <b>tres de ellos son idénticos</b>. Cífrelo en los dos modos y compare bloque contra bloque.</p>
+  <div class="panel inter">
+    <div class="et">Un registro con valores repetidos</div>
+    <textarea id="d1t" spellcheck="false">CUOTA=000100000 CUOTA=000100000 CUOTA=000100000 CUOTA=000900000 </textarea>
+    <div class="fila"><button id="d1go">Cifrar en ECB y en CBC</button><span class="leyenda" style="margin:0">La llave es la misma en los dos casos</span></div>
+    <div class="dos">
+      <div><div class="et">Modo ECB · bloque a bloque</div><div class="sal" id="d1ecb">—</div></div>
+      <div><div class="et">Modo CBC · bloque a bloque</div><div class="sal" id="d1cbc">—</div></div>
+    </div>
+    <div class="leyenda">Los bloques que aparecen <span class="mal">en naranja</span> están repetidos dentro del mismo texto cifrado.</div>
+  </div>
+
+  <details><summary>Por qué pasa esto, y por qué importa más en una base de datos que en una foto</summary>
+    <p>ECB cifra cada bloque de dieciséis bytes por separado y siempre de la misma forma. Bloques de entrada iguales producen bloques de salida iguales, así que <b>la estructura del mensaje sobrevive al cifrado</b>. En la imagen eso dibuja el escudo; en una tabla permite contar cuántos registros comparten un valor, y a partir de ahí deducir cuál es sin descifrar nada.</p>
+    <p>CBC encadena cada bloque con el anterior y arranca de un vector de inicialización aleatorio, así que dos bloques iguales producen salidas distintas. CTR hace lo propio combinando cada bloque con un contador distinto. Ninguno de los dos, sin embargo, <b>detecta</b> una alteración: eso es lo que van a comprobar en el ejercicio 2.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 1 ───────────── -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 15 minutos</div><h2>Reproducir el escudo</h2></div>
+  <p class="lead">Tomen una imagen con zonas de color uniforme, cífrenla en ECB y en CBC conservando la cabecera del archivo, y comparen. Entreguen las dos imágenes y la explicación de la diferencia.</p>
+
+  <ol class="pasos">
+    <li><span><b>Consigan una imagen plana.</b> Un BMP de 24 bits con pocos colores y zonas grandes de un solo tono. Si la imagen tiene degradados o fotografía, el efecto no aparece: ECB solo delata lo que se repite, y un degradado no se repite.</span></li>
+    <li><span><b>Separen la cabecera de los píxeles.</b> En un BMP la cabecera ocupa los primeros 54 bytes. Si la cifran también, el archivo deja de abrirse.</span></li>
+    <li><span><b>Cifren solo los píxeles</b>, en ECB y en CBC, con la misma llave y sin relleno.</span></li>
+    <li><span><b>Vuelvan a pegar la cabecera</b> delante de cada resultado y abran los dos archivos.</span></li>
+  </ol>
+
+  <div class="cmd-t">Con OpenSSL · la llave en hexadecimal, no una contraseña</div>
+  <div class="cmd"><pre><span class="c"># llave de 256 bits y vector de 128, como el martes</span>
+openssl rand -hex 32 &gt; llave.hex
+openssl rand -hex 16 &gt; vi.hex
+
+<span class="c"># separar cabecera (54 bytes) y píxeles</span>
+head -c 54 escudo.bmp &gt; cabecera.bin
+tail -c +55 escudo.bmp &gt; pixeles.bin
+
+<span class="c"># cifrar SOLO los píxeles, sin relleno, con -K mayúscula</span>
+openssl enc -aes-256-ecb -in pixeles.bin -out ecb.bin -K $(cat llave.hex) -nopad
+openssl enc -aes-256-cbc -in pixeles.bin -out cbc.bin -K $(cat llave.hex) -iv $(cat vi.hex) -nopad
+
+<span class="c"># volver a armar las imágenes</span>
+cat cabecera.bin ecb.bin &gt; escudo-ecb.bmp
+cat cabecera.bin cbc.bin &gt; escudo-cbc.bmp</pre></div>
+
+  <div class="cmd-t">O con Python, que además les deja medir</div>
+  <div class="cmd"><pre><span class="c"># pip install pillow cryptography</span>
+<span class="n">import</span> os
+<span class="n">from</span> PIL <span class="n">import</span> Image
+<span class="n">from</span> cryptography.hazmat.primitives.ciphers <span class="n">import</span> Cipher, algorithms, modes
+
+img = Image.open(<span class="n">"escudo.png"</span>).convert(<span class="n">"RGB"</span>)
+img = img.quantize(colors=2).convert(<span class="n">"RGB"</span>)     <span class="c"># aplanar: sin esto no se ve nada</span>
+crudo = img.tobytes()
+<span class="n">assert</span> (img.width * 3) % 16 == 0                <span class="c"># la fila debe cuadrar con el bloque</span>
+
+llave, vi = os.urandom(32), os.urandom(16)
+<span class="n">def</span> cifra(modo):
+    c = Cipher(algorithms.AES(llave), modo).encryptor()
+    <span class="n">return</span> c.update(crudo) + c.finalize()
+
+Image.frombytes(<span class="n">"RGB"</span>, img.size, cifra(modes.ECB())[:len(crudo)]).save(<span class="n">"ecb.png"</span>)
+Image.frombytes(<span class="n">"RGB"</span>, img.size, cifra(modes.CBC(vi))[:len(crudo)]).save(<span class="n">"cbc.png"</span>)</pre></div>
+
+  <div class="adv"><b>Si no se ve el patrón</b>, revisen tres cosas en este orden: que la imagen esté aplanada a pocos colores, que el ancho en bytes sea múltiplo de 16 —de lo contrario cada fila arranca desfasada y el dibujo se desalinea— y que hayan usado <b>-K mayúscula</b> con la llave en hexadecimal y no <b>-k</b> minúscula con una contraseña. Esa diferencia es el ejercicio 3.</div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>Las dos imágenes cifradas.</li>
+      <li>Tres o cuatro frases explicando por qué una deja ver el dibujo y la otra no. No basta con decir «porque ECB es inseguro»: hay que decir qué propiedad lo hace visible.</li>
+      <li>Una frase sobre dónde vieron ustedes ese mismo problema en Coopaburrá, con el sistema y el hallazgo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────── EJERCICIO 2 ───────────── -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 20 minutos</div><h2>Alterar un byte y ver quién se da cuenta</h2></div>
+  <p class="lead">Cifren un texto en <b>CTR</b> y en <b>GCM</b>, alteren un byte del texto cifrado en los dos casos e intenten descifrar. Documenten qué pasa en cada modo y por qué. Este panel hace el ataque completo en su navegador; el mismo ataque en Python está más abajo.</p>
+
+  <div class="panel inter">
+    <div class="et">El ataque</div>
+    <div class="fila" style="margin-bottom:4px"><label for="e2t">Mensaje original</label></div>
+    <input type="text" id="e2t" value="VALOR=0000100000" spellcheck="false">
+    <div class="fila">
+      <label for="e2i">Byte número</label><input type="number" id="e2i" value="6" min="0" style="width:90px">
+      <label for="e2m">Alterar con</label><input type="text" id="e2m" value="09" style="width:90px">
+      <button id="e2go">Ejecutar en los dos modos</button>
+    </div>
+    <div class="sal" id="e2s">Pulse el botón. La llave se genera al azar en cada intento.</div>
+    <div class="leyenda">El byte 6 del mensaje de ejemplo es el primer cero del valor. Combinarlo con <span class="mal">09</span> lo convierte en un nueve: novecientos mil pesos en lugar de cien mil, sin conocer la llave.</div>
+  </div>
+
+  <details><summary>Qué acaba de pasar, en detalle</summary>
+    <p><b>En CTR</b> el cifrado consiste en combinar el mensaje con una secuencia que depende de la llave y de un contador. Esa combinación es reversible byte a byte: cambiar un byte del texto cifrado cambia <b>exactamente ese byte</b> del texto en claro, y ningún otro. El atacante no necesita la llave para saber qué va a salir; le basta saber qué decía el original en esa posición. Por eso la salida no es basura: es el mensaje que el atacante eligió.</p>
+    <p><b>En GCM</b> el cifrado es el mismo —GCM usa CTR por dentro—, pero además calcula una etiqueta de autenticación sobre el texto cifrado y sobre los datos asociados. Al descifrar, la etiqueta se recalcula y se compara. Si no coincide, la librería <b>no devuelve el texto</b>: lanza un error. No devuelve el texto alterado, ni el texto a medias: no devuelve nada. Esa es la diferencia entre cifrar y proteger.</p>
+    <p><b>Los datos asociados</b> del ejemplo —el número de cuenta— no van cifrados, pero sí entran en la etiqueta. Sirven para amarrar el mensaje a su contexto: un texto cifrado válido para la cuenta 4471 no se puede reutilizar en otra cuenta, porque la etiqueta ya no cuadra.</p>
+  </details>
+
+  <div class="cmd-t">El mismo ejercicio en Python</div>
+  <div class="cmd"><pre><span class="c"># pip install cryptography</span>
+<span class="n">import</span> os
+<span class="n">from</span> cryptography.hazmat.primitives.ciphers.aead <span class="n">import</span> AESGCM
+
+llave = AESGCM.generate_key(bit_length=256)
+nonce = os.urandom(12)                           <span class="c"># 96 bits, distinto cada vez</span>
+c = AESGCM(llave).encrypt(nonce, b<span class="n">"VALOR=0000100000"</span>, b<span class="n">"cuenta=4471"</span>)
+
+alterado = bytearray(c); alterado[6] ^= 0x09      <span class="c"># el ataque de arriba</span>
+AESGCM(llave).decrypt(nonce, bytes(alterado), b<span class="n">"cuenta=4471"</span>)   <span class="c"># → InvalidTag</span></pre></div>
+
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>Las dos salidas: la de CTR, con el valor cambiado, y la de GCM, con el error.</li>
+      <li>La explicación de por qué CTR permite elegir el resultado del ataque sin conocer la llave.</li>
+      <li><b>La pregunta que hay que responder sí o sí:</b> ¿qué pasaría si el mismo nonce se usara en dos registros distintos con la misma llave? Respondan para CTR y para GCM por separado, porque no es lo mismo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────── EJERCICIO 3 ───────────── -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Auditar la evidencia C</h2></div>
+  <p class="lead">Esta es la línea real del programador de tareas de Coopaburrá: la que produce el respaldo diario que viaja a Sabaneta los viernes. Tiene <b>tres problemas distintos</b> y solo uno es evidente.</p>
+
+  <div class="cmd"><pre>openssl enc -aes-256-cbc -in respaldo_diario.sql -out respaldo_diario.enc \
+  -k $(cat /opt/backup/llave.txt)</pre></div>
+
+  <h3>Herramienta · qué hace realmente cada opción</h3>
+  <p>Las herramientas ofrecen dos formas de darles una llave y no son lo mismo, aunque se parezcan en la línea de comandos. Escriba una contraseña y compare.</p>
+  <div class="panel inter">
+    <div class="et">Derivación de llave</div>
+    <div class="fila">
+      <input type="text" id="e3p" value="llave-de-respaldos-2019" spellcheck="false" style="flex:1;min-width:240px">
+      <button id="e3go">Derivar con 1 iteración y con 600.000</button>
+    </div>
+    <div class="sal" id="e3s">—</div>
+    <div class="leyenda">La misma contraseña produce siempre la misma llave. Lo que cambia es cuánto le cuesta a un atacante probar la siguiente.</div>
+  </div>
+
+  <div class="tres" style="margin-top:14px">
+    <div class="tarj az"><h4>-K mayúscula</h4><p>Recibe la llave en hexadecimal: exactamente los bits que se van a usar. Es lo correcto cuando ya se tiene una llave generada al azar.</p></div>
+    <div class="tarj na"><h4>-k minúscula</h4><p>Recibe una contraseña de texto y la pasa por una función de derivación. La calidad depende de esa función y de sus parámetros.</p></div>
+    <div class="tarj fill"><h4>Lo que hace el script del caso</h4><p>Usa la minúscula con el contenido de un archivo. Trata una llave que ya era aleatoria como si fuera una contraseña.</p></div>
+  </div>
+
+  <div class="adv"><b>La herramienta lo está avisando.</b> Al correr esa línea, OpenSSL imprime en pantalla: <span class="rojo">*** WARNING : deprecated key derivation used. Using -iter or -pbkdf2 would be better.</span> Está ahí desde 2018, cada noche, entre las 11:40 y las 2:15. Nadie lee la salida de un proceso programado.</div>
+
+  <h3>Su hoja de auditoría</h3>
+  <p>Escriban los tres problemas. Este panel no los corrige: es para ordenar el trabajo antes de pasarlo al informe.</p>
+  <div class="panel inter">
+    <div class="et">Problema A · el evidente</div>
+    <textarea id="e3a" placeholder="Qué está mal y qué consecuencia tiene"></textarea>
+    <div class="et" style="margin-top:12px">Problema B · sobre cómo se deriva la llave</div>
+    <textarea id="e3b" placeholder="Qué está mal y qué consecuencia tiene"></textarea>
+    <div class="et" style="margin-top:12px">Problema C · sobre qué hace, y qué no hace, el modo utilizado</div>
+    <textarea id="e3c" placeholder="Qué está mal y qué consecuencia tiene"></textarea>
+    <div class="et" style="margin-top:12px">La línea corregida</div>
+    <textarea id="e3d" placeholder="Escríbanla completa, con todas sus opciones"></textarea>
+    <div class="fila"><button class="sec" id="e3guarda">Descargar mi hoja</button><span class="leyenda" style="margin:0">Se descarga a su equipo. Nada sale del navegador.</span></div>
+  </div>
+
+  <details><summary>Cómo saber si van bien encaminados</summary>
+    <p>No son pistas de la respuesta, son las preguntas que la respuesta tiene que contestar. <b>Sobre la llave:</b> ¿quién puede leerla hoy, y en cuántos sitios distintos está? Cuenten los sitios; son más de uno. <b>Sobre la derivación:</b> si la llave ya venía de un generador aleatorio, ¿qué le aporta pasarla por una función pensada para contraseñas humanas, y qué le quita? <b>Sobre el modo:</b> si alguien modifica el archivo de respaldo mientras viaja en el carro del mensajero, ¿en qué momento lo notaría Coopaburrá, y cómo?</p>
+    <p>Y para la línea corregida, tres preguntas más: ¿de dónde sale la llave?, ¿cómo se la entregan a la herramienta sin que aparezca en la lista de procesos?, y ¿qué tendría que pasar al restaurar para que se sepa que el archivo llegó íntegro?</p>
+  </details>
+</section>
+
+<!-- ───────────── REPASO ───────────── -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué modo es el del caso?</h2></div>
+  <p class="lead">Seis situaciones. En una de ellas la respuesta correcta es que ningún modo sirve, porque el problema no es el modo.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ───────────── ENTREGA ───────────── -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo al final del bloque. Se evalúa el análisis, no el resultado.</p>
+  <ul class="chk">
+    <li>Las dos imágenes del ejercicio 1, con la explicación de qué propiedad de ECB hace visible el dibujo.</li>
+    <li>Las dos salidas del ejercicio 2 y la respuesta sobre el nonce repetido, separada para CTR y para GCM.</li>
+    <li>Los tres problemas de la evidencia C, cada uno con su consecuencia para Coopaburrá.</li>
+    <li>La línea corregida, completa.</li>
+    <li>Una frase final: de los hallazgos H3 y H4 del caso, ¿cuál de los dos quedaría resuelto con lo que aprendieron hoy, y cuál no?</li>
+  </ul>
+  <div class="adv"><b>Regla de trabajo del módulo.</b> No carguen el caso, las evidencias ni sus respuestas en servicios en línea de terceros. Es la regla 5 del caso y, además, lo que se pega en un sitio público deja de ser confidencial en ese instante.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 2</span>
+</footer>
+</div>
+
+<script>
+/* ═════════ Demostración 1 · ECB frente a CBC, bloque a bloque ═════════ */
+async function ecbCifra(llave, datos){
+  /* WebCrypto no expone ECB. Un bloque en CBC con vector en cero es exactamente
+     un bloque en ECB, así que se cifra bloque por bloque y se toma el primero. */
+  const k = await crypto.subtle.importKey("raw", llave, "AES-CBC", false, ["encrypt"]);
+  const cero = new Uint8Array(16), salida = new Uint8Array(datos.length);
+  for (let i = 0; i < datos.length; i += 16){
+    const c = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-CBC", iv: cero }, k, datos.slice(i, i + 16)));
+    salida.set(c.slice(0, 16), i);
+  }
+  return salida;
+}
+
+function pintaBloques(destino, h){
+  const bl = h.match(/.{32}/g) || [];
+  const cuenta = {};
+  bl.forEach(function(b){ cuenta[b] = (cuenta[b] || 0) + 1; });
+  destino.innerHTML = bl.map(function(b, i){
+    const rep = cuenta[b] > 1;
+    return '<span style="color:var(--gris)">' + (i + 1) + '</span>  ' +
+           '<span class="' + (rep ? "mal" : "") + '">' + b + "</span>";
+  }).join("\n");
+}
+
+$("d1go").addEventListener("click", async function(){
+  let t = $("d1t").value;
+  while (t.length % 16) t += " ";                  // completar el último bloque
+  const datos = bytes(t), llave = aleatorio(32);
+  pintaBloques($("d1ecb"), hex(await ecbCifra(llave, datos)));
+
+  const k = await crypto.subtle.importKey("raw", llave, "AES-CBC", false, ["encrypt"]);
+  const cbc = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-CBC", iv: aleatorio(16) }, k, datos));
+  pintaBloques($("d1cbc"), hex(cbc.slice(0, datos.length)));
+});
+
+/* ═════════ Ejercicio 2 · alterar un byte en CTR y en GCM ═════════ */
+$("e2go").addEventListener("click", async function(){
+  const txt = $("e2t").value;
+  const i = Math.max(0, Math.min(bytes(txt).length - 1, parseInt($("e2i").value, 10) || 0));
+  const masc = (desdeHex($("e2m").value)[0] || 0);
+  const datos = bytes(txt), asociado = bytes("cuenta=4471");
+  const lineas = [];
+
+  /* --- CTR: sin etiqueta --- */
+  const llaveC = aleatorio(32), contador = aleatorio(16);
+  const kC = await crypto.subtle.importKey("raw", llaveC, "AES-CTR", false, ["encrypt", "decrypt"]);
+  const par = { name: "AES-CTR", counter: contador, length: 64 };
+  const cC = new Uint8Array(await crypto.subtle.encrypt(par, kC, datos));
+  const cCa = cC.slice(); cCa[i] ^= masc;
+  const claroC = texto(await crypto.subtle.decrypt(par, kC, cCa));
+  lineas.push("CTR · original : " + txt);
+  lineas.push("CTR · alterado : " + claroC + "        ← descifra sin quejarse");
+
+  /* --- GCM: con etiqueta --- */
+  const llaveG = aleatorio(32), nonce = aleatorio(12);
+  const kG = await crypto.subtle.importKey("raw", llaveG, "AES-GCM", false, ["encrypt", "decrypt"]);
+  const parG = { name: "AES-GCM", iv: nonce, additionalData: asociado, tagLength: 128 };
+  const cG = new Uint8Array(await crypto.subtle.encrypt(parG, kG, datos));
+  const cGa = cG.slice(); cGa[i] ^= masc;
+  lineas.push("");
+  lineas.push("GCM · original : " + texto(await crypto.subtle.decrypt(parG, kG, cG)));
+  try {
+    lineas.push("GCM · alterado : " + texto(await crypto.subtle.decrypt(parG, kG, cGa)));
+  } catch (e) {
+    lineas.push("GCM · alterado : ✗ la etiqueta no coincide — el descifrado se rechaza");
+  }
+  lineas.push("");
+  lineas.push("byte alterado  : posición " + i + ", combinado con 0x" + (masc.toString(16).padStart(2, "0")));
+  $("e2s").textContent = lineas.join("\n");
+});
+
+/* ═════════ Ejercicio 3 · qué cuesta derivar una llave ═════════ */
+async function deriva(pass, iter, veces){
+  veces = veces || 1;
+  const base = await crypto.subtle.importKey("raw", bytes(pass), "PBKDF2", false, ["deriveBits"]);
+  const par = { name: "PBKDF2", salt: bytes("sal-fija-del-ejemplo"), iterations: iter, hash: "SHA-256" };
+  const t = performance.now();
+  let bits;
+  for (let i = 0; i < veces; i++) bits = await crypto.subtle.deriveBits(par, base, 256);
+  return { hex: hex(bits), ms: (performance.now() - t) / veces };   // promedio por intento
+}
+
+$("e3go").addEventListener("click", async function(){
+  const p = $("e3p").value;
+  $("e3s").textContent = "calculando… la segunda derivación tarda a propósito";
+  try {
+    const a = await deriva(p, 1, 200);            // una sola pasada no se puede medir
+    const b = await deriva(p, 600000, 1);
+    const factor = a.ms > 0 ? Math.round(b.ms / a.ms) : 0;
+    $("e3s").textContent =
+      "1 iteración        : " + a.hex + "\n" +
+      "                     " + ms(a.ms) + " por intento   (promedio de 200 pasadas)\n\n" +
+      "600.000 iteraciones: " + b.hex + "\n" +
+      "                     " + ms(b.ms) + " por intento\n\n" +
+      "La llave cambia por completo, pero lo que importa es el costo:\n" +
+      "la segunda cuesta unas " + factor.toLocaleString("es-CO") + " veces más que la primera.\n" +
+      "Frente a una tarjeta gráfica, que prueba miles de millones de resúmenes\n" +
+      "simples por segundo, ese factor es toda la defensa que tiene una contraseña.";
+  } catch (e) {
+    $("e3s").textContent = "No se pudo derivar: " + e.message;
+  }
+});
+
+/* descargar la hoja de auditoría */
+$("e3guarda").addEventListener("click", function(){
+  const t = "LABORATORIO 2 · HOJA DE AUDITORIA DE LA EVIDENCIA C\n" +
+    "SIO0010 Tecnicas Criptograficas · Caso Coopaburra\n\n" +
+    "LINEA AUDITADA\n" +
+    "openssl enc -aes-256-cbc -in respaldo_diario.sql -out respaldo_diario.enc -k $(cat /opt/backup/llave.txt)\n\n" +
+    "PROBLEMA A · el evidente\n" + $("e3a").value + "\n\n" +
+    "PROBLEMA B · la derivacion de la llave\n" + $("e3b").value + "\n\n" +
+    "PROBLEMA C · el modo utilizado\n" + $("e3c").value + "\n\n" +
+    "LINEA CORREGIDA\n" + $("e3d").value + "\n";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([t], { type: "text/plain;charset=utf-8" }));
+  a.download = "Laboratorio-2-auditoria-evidencia-C.txt";
+  a.click(); URL.revokeObjectURL(a.href);
+});
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["El resultado del cifrado deja ver la silueta de lo que se cifró.",
+  "ECB", "Bloques iguales producen salidas iguales, así que la estructura del original sobrevive. Es el hallazgo visual de la demostración."],
+ ["Se altera un byte del texto cifrado y el descifrado devuelve el mensaje con exactamente ese byte cambiado, sin ningún error.",
+  "CTR", "El cifrado es una combinación reversible byte a byte. El atacante elige el resultado sin conocer la llave: es el ejercicio 2."],
+ ["Se altera un byte del texto cifrado y el bloque correspondiente sale convertido en basura, mientras el siguiente cambia solo en ese byte.",
+  "CBC", "El encadenamiento propaga el daño a un bloque y refleja el cambio en el siguiente. Tampoco avisa: el descifrado entrega algo."],
+ ["Hay que cifrar el respaldo y, además, poder demostrar al restaurarlo que nadie lo modificó en el camino.",
+  "GCM", "Es el único de los cuatro que autentica. Los otros tres cifran; ninguno detecta una alteración."],
+ ["Repetir el número de un solo uso con la misma llave no solo expone los dos mensajes: además permite falsificar la etiqueta de autenticación.",
+  "GCM", "Repetir el nonce en GCM es catastrófico: compromete la llave de autenticación y, con ella, la capacidad de detectar alteraciones. Es el error de la sesión 1 con un tercer disfraz."],
+ ["Hace falta cifrar un campo de la base de datos de modo que dos registros con el mismo valor produzcan el mismo resultado, para poder agruparlos.",
+  "Ninguno sirve", "El requisito es el problema. Cualquier cifrado que cumpla eso filtra la frecuencia de los valores, que es justamente el ataque de la demostración. Eso se resuelve con tokenización o con índices cifrados, y se ve en la sesión 6."]
+], ["ECB", "CBC", "CTR", "GCM", "Ninguno sirve"], "qver", "qreset", "qmarca");
+</script>

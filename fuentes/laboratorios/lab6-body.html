@@ -1,0 +1,311 @@
+<!-- titulo: Laboratorio 6 · SIO0010 Técnicas Criptográficas -->
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 6 · Sesión 6</div>
+  <h1>Repartir, rotar y tokenizar</h1>
+  <p class="lead">Treinta minutos. Los tres ejercicios corren en su navegador, sin conexión: reparto de secreto de Shamir, rotación de llave maestra sin recifrar, y tokenización. El ejercicio en Python, con pycryptodome, está al final.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que el código corra. Se evalúa que expliquen <b>por qué cada técnica resuelve un hallazgo concreto del caso</b>: Shamir para las llaves de los cajeros, la rotación para la llave maestra, la tokenización para el archivo de analítica.</div>
+</header>
+
+<nav class="nav">
+  <a href="#e1">Ejercicio 1 · Repartir</a>
+  <a href="#e2">Ejercicio 2 · Rotar</a>
+  <a href="#e3">Ejercicio 3 · Tokenizar</a>
+  <a href="#rep">Repaso</a>
+  <a href="#ent">Qué se entrega</a>
+</nav>
+
+<!-- EJERCICIO 1 · REPARTIR -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 10 minutos</div><h2>Repartir la llave de los cajeros</h2></div>
+  <p class="lead">La llave de los cajeros la tiene hoy una sola persona, de hecho, sin custodios. Con un umbral de tres, repártanla entre cinco custodios: harán falta tres para reconstruirla, y con dos no se obtiene <b>nada</b>. Ese último punto es el que hay que ver con los ojos.</p>
+  <div class="panel inter">
+    <div class="et">La llave de los cajeros (128 bits)</div>
+    <div class="fila"><button id="e1gen">Generar la llave</button><span class="leyenda" id="e1k" style="margin:0">—</span></div>
+    <div class="et" style="margin-top:12px">Repartir 3 de 5</div>
+    <div class="fila"><button id="e1rep" class="sec" disabled>Repartir entre cinco custodios</button></div>
+    <div id="e1partes"></div>
+    <div class="et" style="margin-top:12px">Reconstruir · marquen las partes que entregan</div>
+    <div class="fila" id="e1chk"></div>
+    <div class="sal" id="e1out" style="margin-top:8px">Genere la llave, repártala y marque partes para reconstruir.</div>
+  </div>
+  <details><summary>Por qué con dos partes no sale «casi» la llave, sino nada</summary>
+    <p>Cada byte de la llave es el término independiente de un polinomio secreto de grado dos —una parábola en aritmética de campo finito—. Cada custodio recibe un punto de esa parábola. Con tres puntos hay una sola parábola que pasa por ellos, así que el término independiente queda determinado: se recupera la llave. Con dos puntos pasan <b>infinitas</b> parábolas, una por cada valor posible del secreto, y todas son igual de probables. Por eso dos custodios no obtienen una versión aproximada: obtienen un valor que no tiene ninguna relación con la llave real. Compruébenlo marcando solo dos partes.</p>
+  </details>
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>La reconstrucción correcta con tres partes y el resultado sin sentido con dos.</li>
+      <li>Una frase: cómo cambia el hallazgo H6 —«las llaves las tiene quien las necesitó»— si se reparten así entre custodios.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- EJERCICIO 2 · ROTAR -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 10 minutos</div><h2>Rotar la llave maestra sin tocar los datos</h2></div>
+  <p class="lead">«Rotar llaves es inviable, habría que recifrarlo todo.» Este ejercicio demuestra que no. Se cifran los datos con una llave de datos (DEK), y la DEK se guarda envuelta bajo una llave maestra (KEK). Rotar la maestra vuelve a envolver la DEK: cambian <b>40 bytes</b>, y ni un solo registro se recifra.</p>
+  <div class="panel inter">
+    <div class="et">Mil registros cifrados en sobre</div>
+    <div class="fila"><button id="e2gen">Cifrar 1.000 registros con una DEK</button></div>
+    <div class="sal" id="e2s1">—</div>
+    <div class="et" style="margin-top:12px">Rotar la llave maestra</div>
+    <div class="fila"><button id="e2rot" class="sec" disabled>Rotar la KEK y volver a envolver la DEK</button></div>
+    <div class="sal" id="e2s2">—</div>
+  </div>
+  <details><summary>Qué es cifrado en sobre, en una imagen</summary>
+    <p>Imaginen mil cajas cerradas con la misma llave pequeña, la DEK. Esa llave pequeña se guarda dentro de una caja fuerte, la KEK. <b>Rotar</b> la llave maestra es cambiar la caja fuerte y mover la llave pequeña de la vieja a la nueva: las mil cajas siguen cerradas con la misma llave pequeña, intactas. Recifrar todo sería abrir las mil cajas y volver a cerrarlas con otra llave —lo que nadie quiere hacer, y por eso no se rota nunca en Coopaburrá—. Con este diseño, rotar cuesta 40 bytes.</p>
+  </details>
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>Los dos números: cuántos bytes cambiaron al rotar frente al tamaño total de los datos.</li>
+      <li>Una frase para el que dice que rotar es inviable, usando esos dos números.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- EJERCICIO 3 · TOKENIZAR -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 10 minutos</div><h2>Tokenizar las cédulas del archivo de analítica</h2></div>
+  <p class="lead">El área de analítica necesita cruzar datos por persona, pero no necesita las cédulas. Reemplacen cada cédula por un token aleatorio, guarden la correspondencia aparte, y expliquen qué puede hacer un tercero con el archivo tokenizado y qué no.</p>
+  <div class="panel inter">
+    <div class="et">Archivo de analítica · una cédula por línea (de ejemplo, ficticias)</div>
+    <textarea id="e3in" spellcheck="false">1015442387
+1015442387
+71298455
+43876120
+71298455
+1015442387</textarea>
+    <div class="fila"><button id="e3go">Tokenizar</button><span class="leyenda" style="margin:0">Las cédulas del ejemplo son inventadas</span></div>
+    <div class="dos">
+      <div><div class="et">Archivo que se entrega a analítica</div><div class="sal" id="e3tok">—</div></div>
+      <div><div class="et">Tabla de correspondencia · se guarda aparte, con acceso restringido</div><div class="sal" id="e3map">—</div></div>
+    </div>
+  </div>
+  <details><summary>Qué conserva y qué destruye la tokenización</summary>
+    <p><b>Conserva</b> la posibilidad de cruzar: la misma cédula produce siempre el mismo token, así que analítica puede contar cuántas operaciones hizo cada persona sin saber quién es. <b>Destruye</b> la posibilidad de identificar: el token es aleatorio y no tiene ninguna relación matemática con la cédula, así que del token no se vuelve a la cédula sin la tabla de correspondencia. Un tercero que reciba el archivo tokenizado puede hacer estadística, pero no puede señalar a nadie.</p>
+    <p>Es distinto de cifrar: un dato cifrado se puede descifrar con la llave, y dos datos iguales cifrados con modos que preservan patrones pueden delatarse. El token no se «descifra»: se busca en una tabla que vive en otro lugar, bajo otro control. Por eso es la respuesta correcta para un archivo que sale del área que lo custodia.</p>
+  </details>
+  <div class="ent">
+    <div class="et">Qué se entrega de este ejercicio</div>
+    <ul>
+      <li>El archivo tokenizado y la tabla de correspondencia, por separado.</li>
+      <li><b>La respuesta que va directo a la entrega final:</b> qué puede hacer un tercero con el archivo tokenizado y qué no, y por qué esto es mejor que cifrar el campo.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- REPASO -->
+<section id="rep">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué técnica lo resuelve?</h2></div>
+  <p class="lead">Seis situaciones de gestión de llaves y datos. Elijan la técnica adecuada.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" class="leyenda" style="margin:0"></span></div>
+</section>
+
+<!-- ENTREGA -->
+<section id="ent">
+  <div class="sec-h"><div class="sec-n">Cierre</div><h2>Qué se entrega y cómo se califica</h2></div>
+  <p class="lead">Una página por equipo con los tres resultados y, sobre todo, la respuesta del ejercicio 3, que va directo a la recomendación de la entrega final.</p>
+  <ul class="chk">
+    <li>La reconstrucción de Shamir con tres partes y el resultado con dos.</li>
+    <li>Los dos números de la rotación: bytes cambiados frente a datos totales.</li>
+    <li>El archivo tokenizado y su tabla de correspondencia.</li>
+    <li>La respuesta sobre qué puede y qué no puede hacer un tercero con el archivo tokenizado.</li>
+    <li>Una frase que ate los tres a sus hallazgos: H6 los cajeros, la rotación la llave maestra, la tokenización el archivo que sale del área.</li>
+  </ul>
+  <div class="adv"><b>Con esto se cierra el módulo.</b> Los seis laboratorios alimentan el informe de aseguramiento criptográfico de Coopaburrá. La sustentación ante el comité es el 8 de abril: lo que hoy es un ejercicio, allí es una recomendación con costo, plazo y responsable.</div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 6</span>
+</footer>
+</div>
+
+<div class="cmd-t" style="max-width:1120px;margin:32px auto 0;padding:0 22px">Los tres ejercicios en Python, con la biblioteca estándar, cryptography y pycryptodome</div>
+<div class="wrap" style="padding-top:0"><div class="cmd"><pre><span class="c"># pip install cryptography pycryptodome</span>
+<span class="n">import</span> os, secrets
+<span class="n">from</span> Crypto.Protocol.SecretSharing <span class="n">import</span> Shamir
+<span class="n">from</span> cryptography.hazmat.primitives.keywrap <span class="n">import</span> aes_key_wrap, aes_key_unwrap
+
+<span class="c"># 1 · repartir la llave de los cajeros: cinco custodios, umbral de tres</span>
+llave_cajeros = os.urandom(16)
+partes = Shamir.split(3, 5, llave_cajeros)
+assert Shamir.combine(partes[:3]) == llave_cajeros      <span class="c"># tres partes bastan</span>
+
+<span class="c"># 2 · rotar la llave maestra sin recifrar los datos</span>
+kek_vieja, kek_nueva = os.urandom(32), os.urandom(32)
+dek_envuelta = aes_key_wrap(kek_vieja, os.urandom(32))
+dek_rotada   = aes_key_wrap(kek_nueva, aes_key_unwrap(kek_vieja, dek_envuelta))
+<span class="c"># cambiaron 40 bytes; ni un registro se recifro</span>
+
+<span class="c"># 3 · tokenizar una cedula sin relacion con el valor original</span>
+token = secrets.token_hex(8)                            <span class="c"># sustituto aleatorio</span>
+correspondencia = {token: <span class="n">"1015442387"</span>}                <span class="c"># se guarda aparte, con acceso restringido</span></pre></div></div>
+
+<script>
+/* ═════════ Shamir sobre GF(256) ═════════ */
+  /* Reparto de secreto de Shamir sobre GF(256), byte a byte.
+     Umbral t de n: se necesitan t partes para reconstruir; con t-1 no se obtiene nada.
+     Es el mismo esquema que usa pycryptodome; aquí en JavaScript para el laboratorio. */
+  
+  // Tablas de logaritmo y exponencial en GF(256) con el polinomio 0x11b (el de AES).
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  (function(){
+    let x = 1;
+    for (let i = 0; i < 255; i++){ EXP[i] = x; LOG[x] = i; x ^= (x << 1) ^ ((x & 0x80) ? 0x11b : 0); x &= 0xff; }
+    for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+  })();
+  
+  function mul(a, b){ return (a && b) ? EXP[LOG[a] + LOG[b]] : 0; }
+  function div(a, b){ return a ? EXP[(LOG[a] - LOG[b] + 255) % 255] : 0; }
+  
+  /* Evalúa un polinomio (coeficientes de menor a mayor grado) en x, en GF(256). */
+  function evalua(coef, x){
+    let y = 0;
+    for (let i = coef.length - 1; i >= 0; i--) y = mul(y, x) ^ coef[i];
+    return y;
+  }
+  
+  /* Reparte un secreto (Uint8Array) en n partes con umbral t.
+     Cada parte es { x, y } con y del mismo largo que el secreto. */
+  function repartir(secreto, t, n, azar){
+    azar = azar || (k => { const b = new Uint8Array(k); crypto.getRandomValues(b); return b; });
+    const partes = [];
+    for (let x = 1; x <= n; x++) partes.push({ x: x, y: new Uint8Array(secreto.length) });
+    for (let j = 0; j < secreto.length; j++){
+      const coef = new Uint8Array(t);
+      coef[0] = secreto[j];                       // término independiente = el byte del secreto
+      const r = azar(t - 1);
+      for (let i = 1; i < t; i++) coef[i] = r[i - 1];
+      for (const p of partes) p.y[j] = evalua(coef, p.x);
+    }
+    return partes;
+  }
+  
+  /* Reconstruye el secreto por interpolación de Lagrange en x = 0. */
+  function reconstruir(partes){
+    const largo = partes[0].y.length;
+    const out = new Uint8Array(largo);
+    for (let j = 0; j < largo; j++){
+      let acc = 0;
+      for (let i = 0; i < partes.length; i++){
+        let num = 1, den = 1;
+        for (let k = 0; k < partes.length; k++){
+          if (k === i) continue;
+          num = mul(num, partes[k].x);            // (0 - x_k) = x_k en GF(2^8)
+          den = mul(den, partes[i].x ^ partes[k].x);
+        }
+        acc ^= mul(partes[i].y[j], div(num, den));
+      }
+      out[j] = acc;
+    }
+    return out;
+  }
+
+/* ═════════ Ejercicio 1 · repartir ═════════ */
+let e1 = {};
+$("e1gen").addEventListener("click", function(){
+  e1.llave = aleatorio(16);
+  $("e1k").textContent = "llave = " + hex(e1.llave);
+  $("e1rep").disabled = false;
+  $("e1partes").innerHTML = ""; $("e1chk").innerHTML = ""; $("e1out").textContent = "Ahora repártala.";
+});
+$("e1rep").addEventListener("click", function(){
+  e1.partes = repartir(e1.llave, 3, 5);
+  $("e1partes").innerHTML = '<table style="margin-top:8px"><tbody>' + e1.partes.map(function(p){
+    return '<tr><td style="font-weight:700;color:var(--tinta);white-space:nowrap">Custodio ' + p.x +
+           '</td><td style="font-family:var(--mono);font-size:12px">' + hex(p.y) + "</td></tr>";
+  }).join("") + "</tbody></table>";
+  $("e1chk").innerHTML = e1.partes.map(function(p){
+    return '<label style="font-family:var(--mono);font-size:12.5px"><input type="checkbox" data-x="' + p.x +
+           '" style="width:auto"> Custodio ' + p.x + "</label>";
+  }).join(" &nbsp; ");
+  $$("#e1chk input").forEach(c => c.addEventListener("change", reconstruyeE1));
+  $("e1out").textContent = "Marque partes. Con tres o más, la llave vuelve; con dos, no.";
+});
+function reconstruyeE1(){
+  const marcadas = $$("#e1chk input").filter(c => c.checked).map(c => +c.dataset.x);
+  if (marcadas.length < 2){ $("e1out").textContent = "Marque al menos dos partes."; return; }
+  const sel = e1.partes.filter(p => marcadas.indexOf(p.x) >= 0);
+  const r = reconstruir(sel);
+  const ok = hex(r) === hex(e1.llave);
+  $("e1out").textContent =
+    "partes usadas : " + marcadas.join(", ") + "  (" + marcadas.length + ")\n" +
+    "resultado     : " + hex(r) + "\n" +
+    "llave original: " + hex(e1.llave) + "\n\n" +
+    (ok ? "✓ RECONSTRUIDA — tres o más partes determinan la llave"
+        : (marcadas.length >= 3 ? "✓ RECONSTRUIDA" : "✗ NO COINCIDE — con dos partes el resultado no tiene relación con la llave real"));
+}
+
+/* ═════════ Ejercicio 2 · rotar ═════════ */
+let e2 = {};
+async function nuevaKEK(){ return crypto.subtle.generateKey({ name: "AES-KW", length: 256 }, true, ["wrapKey", "unwrapKey"]); }
+$("e2gen").addEventListener("click", async function(){
+  e2.dek = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+  e2.kek = await nuevaKEK();
+  // "cifrar" mil registros con la DEK
+  let total = 0;
+  for (let i = 0; i < 1000; i++){
+    const reg = bytes("registro-" + i + "-saldo-" + (i * 137 % 900000));
+    const iv = aleatorio(12);
+    const c = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, e2.dek, reg);
+    total += c.byteLength + 12;
+  }
+  e2.total = total;
+  e2.envuelta = new Uint8Array(await crypto.subtle.wrapKey("raw", e2.dek, e2.kek, "AES-KW"));
+  $("e2s1").textContent =
+    "1.000 registros cifrados con la DEK : " + total.toLocaleString("es-CO") + " bytes\n" +
+    "la DEK, envuelta bajo la KEK        : " + e2.envuelta.length + " bytes\n" +
+    hex(e2.envuelta);
+  $("e2rot").disabled = false; $("e2s2").textContent = "—";
+});
+$("e2rot").addEventListener("click", async function(){
+  const kekNueva = await nuevaKEK();
+  const dekOtra = await crypto.subtle.unwrapKey("raw", e2.envuelta, e2.kek, "AES-KW", { name: "AES-GCM" }, true, ["encrypt", "decrypt"]);
+  const reenvuelta = new Uint8Array(await crypto.subtle.wrapKey("raw", dekOtra, kekNueva, "AES-KW"));
+  const a = hex(new Uint8Array(await crypto.subtle.exportKey("raw", e2.dek)));
+  const b = hex(new Uint8Array(await crypto.subtle.exportKey("raw", dekOtra)));
+  $("e2s2").textContent =
+    "KEK rotada. DEK re-envuelta bajo la KEK nueva:\n" + hex(reenvuelta) + "\n\n" +
+    "la DEK sigue siendo la misma : " + (a === b ? "sí" : "no") + "\n" +
+    "bytes que cambiaron al rotar : " + reenvuelta.length + "\n" +
+    "datos que hubo que recifrar  : 0 de " + e2.total.toLocaleString("es-CO") + " bytes\n\n" +
+    "Rotar la llave maestra costó " + reenvuelta.length + " bytes, no " + e2.total.toLocaleString("es-CO") + ".";
+  e2.kek = kekNueva; e2.envuelta = reenvuelta;
+});
+
+/* ═════════ Ejercicio 3 · tokenizar ═════════ */
+$("e3go").addEventListener("click", function(){
+  const lineas = ($("e3in").value.match(/[^\s]+/g) || []);
+  const mapa = {};                       // cedula -> token, para que iguales den token igual
+  const tok = [];
+  for (const ced of lineas){
+    if (!mapa[ced]) mapa[ced] = "TK-" + hex(aleatorio(6)).toUpperCase();
+    tok.push(mapa[ced]);
+  }
+  $("e3tok").textContent = tok.join("\n");
+  $("e3map").textContent = Object.keys(mapa).map(c => mapa[c] + "  ↔  " + c).join("\n");
+});
+
+/* ═════════ Repaso ═════════ */
+montarQuiz("quiz", [
+ ["Una llave crítica no debe quedar en manos de una sola persona, pero tampoco se puede exigir que estén las cinco a la vez para usarla.",
+  "Reparto de secreto", "Shamir con umbral: se reparte entre cinco y bastan tres. Ni una persona sola la tiene, ni se depende de que estén todas."],
+ ["Hay que cambiar la llave maestra sin volver a cifrar dos terabytes de base de datos.",
+  "Cifrado en sobre", "Con DEK y KEK, rotar la maestra vuelve a envolver la llave de datos: cambian 40 bytes y los datos no se tocan."],
+ ["Un archivo con cédulas sale hacia un área de analítica que necesita cruzar por persona, pero no identificarla.",
+  "Tokenización", "Cada cédula se reemplaza por un token aleatorio, con la correspondencia guardada aparte. Se puede cruzar, no identificar."],
+ ["Las llaves de los cajeros las cargó en 2019 una persona que ya no trabaja allí, sin custodios ni registro.",
+  "Reparto de secreto", "Es el hallazgo H6. Repartir la llave entre custodios con umbral elimina la dependencia de una sola persona y deja registro."],
+ ["Un pagaré firmado hoy debe seguir siendo verificable en 2039, cuando los algoritmos de hoy podrían estar en desuso.",
+  "Sello de tiempo de larga duración", "El valor probatorio a veinte años necesita sellos de tiempo renovables y previsión de transición de algoritmos: es la parte post-cuántica de la sesión."],
+ ["Se quiere poder demostrar que rotar llaves con periodicidad es viable y barato, ante quien dice que es imposible.",
+  "Cifrado en sobre", "El argumento es el ejercicio 2: rotar cuesta unas decenas de bytes por llave envuelta, no el tamaño de los datos."]
+], ["Reparto de secreto", "Cifrado en sobre", "Tokenización", "Sello de tiempo de larga duración"], "qver", "qreset", "qmarca");
+</script>
+

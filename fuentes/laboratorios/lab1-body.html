@@ -1,0 +1,424 @@
+<title>Laboratorio 1 · SIO0010 Técnicas Criptográficas</title>
+<style>
+:root{
+  --naranja:#F36406; --naranja-lav:#FDEFE9; --azul:#154361; --azul-lav:#E9F0F5;
+  --tinta:#15171C; --tinta-2:#4A505C; --gris:#5C5C5C; --papel:#FFFFFF; --papel-2:#F4F4F4;
+  --linea:#D8DBDF; --linea-suave:#E9EBEE; --verde:#1B6B47; --verde-lav:#E1F0E8;
+  --mono:"Consolas","Cascadia Mono",ui-monospace,monospace;
+  --sans:Arial,Helvetica,sans-serif; --titular:"Arial Black",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel-2);color:var(--tinta);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px 80px;background:var(--papel)}
+header.top{padding:26px 0 0}
+.marca{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.marca img{height:40px;width:auto}
+.regla{height:5px;background:var(--tinta);margin:0 0 12px}
+.kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;color:var(--gris)}
+h1{font-family:var(--titular);font-size:38px;line-height:1.1;margin:8px 0 14px;letter-spacing:-.01em}
+.lead{font-size:16px;color:var(--tinta-2);max-width:78ch}
+.aviso{border-left:4px solid var(--naranja);background:var(--naranja-lav);padding:12px 16px;margin:18px 0}
+.aviso b{color:var(--tinta)}
+section{margin-top:44px;scroll-margin-top:16px}
+.sec-h{border-top:4px solid var(--tinta);padding-top:10px;margin-bottom:16px}
+.sec-n{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--naranja)}
+h2{font-family:var(--titular);font-size:25px;margin:6px 0 0;letter-spacing:-.01em}
+h3{font-size:16px;margin:22px 0 8px}
+.nav{position:sticky;top:0;background:var(--papel);border-bottom:1px solid var(--linea);padding:10px 0;z-index:9;display:flex;gap:6px;flex-wrap:wrap}
+.nav a{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--gris);border:1px solid var(--linea);padding:5px 9px;border-radius:2px}
+.nav a:hover{color:var(--naranja);border-color:var(--naranja)}
+.panel{border:1px solid var(--linea);border-radius:3px;padding:16px;margin:14px 0;background:var(--papel)}
+.et{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--azul);margin-bottom:7px}
+textarea,input[type=text]{width:100%;font-family:var(--mono);font-size:13px;padding:9px 11px;border:1px solid var(--linea);border-radius:2px;background:var(--papel);color:var(--tinta);resize:vertical}
+textarea{min-height:72px}
+.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+button{font-family:var(--sans);font-size:13px;font-weight:700;padding:8px 15px;border:1px solid var(--tinta);background:var(--tinta);color:#fff;border-radius:2px;cursor:pointer}
+button:hover{background:var(--naranja);border-color:var(--naranja)}
+button.sec{background:transparent;color:var(--tinta)}
+button.sec:hover{color:var(--naranja)}
+input[type=range]{flex:1;min-width:190px;accent-color:var(--naranja)}
+.sal{font-family:var(--mono);font-size:13px;background:var(--papel-2);border:1px solid var(--linea-suave);border-radius:2px;padding:11px 13px;white-space:pre-wrap;word-break:break-word;min-height:42px}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.dos{grid-template-columns:1fr}}
+.imgs{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.imgs figure{margin:0;text-align:center}
+.imgs img{width:230px;height:230px;image-rendering:pixelated;border:1px solid var(--linea)}
+.imgs figcaption{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin-top:8px;line-height:1.5}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--azul);padding:7px 9px;font-weight:700}
+td{padding:6px 9px;border-bottom:1px solid var(--linea-suave);color:var(--tinta-2)}
+td b{color:var(--tinta)}
+.barra{display:flex;align-items:flex-end;gap:2px;height:130px;border-bottom:2px solid var(--tinta);margin-top:12px}
+.barra div{flex:1;background:var(--azul);position:relative;min-height:1px}
+.barra div.alta{background:var(--naranja)}
+.barra div span{position:absolute;bottom:-19px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:9.5px;color:var(--gris)}
+.leyenda{font-family:var(--mono);font-size:10.5px;color:var(--gris);margin-top:26px}
+.sust{display:grid;grid-template-columns:repeat(13,1fr);gap:5px;margin-top:10px}
+.sust label{font-family:var(--mono);font-size:10px;color:var(--gris);text-align:center;display:block}
+.sust input{width:100%;text-align:center;text-transform:uppercase;font-family:var(--mono);font-size:13px;padding:5px 2px;border:1px solid var(--linea);border-radius:2px}
+.ok{color:var(--verde);font-weight:700}
+.mal{color:var(--naranja);font-weight:700}
+details{border:1px solid var(--linea);border-radius:2px;padding:10px 14px;margin-top:12px;background:var(--papel-2)}
+summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--azul)}
+details p{margin:9px 0 0;font-size:14px;color:var(--tinta-2)}
+.preg{border:1px solid var(--linea);border-radius:3px;padding:13px 15px;margin-bottom:9px}
+.preg .q{font-weight:700;margin-bottom:8px}
+.preg .ops{display:flex;gap:7px;flex-wrap:wrap}
+.preg .ops button{font-size:12px;padding:6px 11px;background:transparent;color:var(--tinta);border-color:var(--linea)}
+.preg .ops button.elegida{background:var(--azul);color:#fff;border-color:var(--azul)}
+.preg .fb{margin-top:9px;font-size:13.5px;display:none}
+footer{margin-top:54px;border-top:1px solid var(--linea);padding-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="marca"><img src="data:image/png;base64,LOCKUP_B64" alt="Institución Universitaria de Envigado"></div>
+  <div class="regla"></div>
+  <div class="kicker">SIO0010 · Técnicas Criptográficas · Laboratorio 1 · Sesión 1</div>
+  <h1>Demostraciones y ejercicios</h1>
+  <p class="lead">Todo funciona sin conexión a internet y sin instalar nada: los cálculos ocurren en su navegador y no se envía información a ningún servidor. Ábralo con doble clic.</p>
+  <div class="aviso"><b>Antes de empezar.</b> No se evalúa que resuelvan los retos. Se evalúa que expliquen <b>qué propiedad del cifrado permitió el ataque</b>. Un ejercicio resuelto sin esa explicación vale la mitad.</div>
+</header>
+
+<nav class="nav">
+  <a href="#d1">Demo · Modos de operación</a>
+  <a href="#e1">Ejercicio 1 · César</a>
+  <a href="#e2">Ejercicio 2 · Sustitución</a>
+  <a href="#e3">Ejercicio 3 · Llave repetida</a>
+  <a href="#d2">Demo · Entropía</a>
+  <a href="#e4">Repaso · Los cuatro servicios</a>
+</nav>
+
+<!-- ───────────── DEMO 1 ───────────── -->
+<section id="d1">
+  <div class="sec-h"><div class="sec-n">Demostración 1</div><h2>El mismo algoritmo, dos modos</h2></div>
+  <p class="lead">El escudo de la Institución, guardado como imagen y cifrado con <b>AES-256</b> y una llave de 256 bits generada al azar. Solo se conservó la cabecera del archivo para poder abrirlo. Lo único que cambia entre las dos imágenes cifradas es el modo de operación.</p>
+  <div class="imgs">
+    <figure><img src="data:image/png;base64,IMG_ORIG"><figcaption>Original<br>sin cifrar</figcaption></figure>
+    <figure><img src="data:image/png;base64,IMG_ECB"><figcaption>AES-256<br>modo ECB</figcaption></figure>
+    <figure><img src="data:image/png;base64,IMG_CBC"><figcaption>AES-256<br>modo CBC</figcaption></figure>
+  </div>
+  <details><summary>¿Por qué el escudo sobrevive al cifrado en ECB?</summary>
+    <p>El escudo tiene zonas grandes de un solo color. Cada zona uniforme produce bloques de entrada idénticos, y en ECB los bloques idénticos producen siempre la misma salida. El cifrado oculta el valor de cada píxel, pero no oculta <b>qué bloques se repiten y dónde</b>, y esa información basta para reconstruir la forma. En CBC cada bloque se encadena con el resultado del anterior, así que dos bloques iguales del original producen salidas distintas.</p>
+    <p><b>Dónde importa de verdad:</b> no en imágenes, sino en bases de datos cifradas campo por campo, donde permite contar cuántos registros comparten un valor y deducir cuál es.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 1 ───────────── -->
+<section id="e1">
+  <div class="sec-h"><div class="sec-n">Ejercicio 1 · 10 minutos</div><h2>Un desplazamiento</h2></div>
+  <p class="lead">El siguiente mensaje está cifrado con el método de César: cada letra se desplazó un número fijo de posiciones. Nadie les dice cuántas. Encuéntrenlo.</p>
+  <div class="panel">
+    <div class="et">Texto cifrado</div>
+    <div class="sal" id="e1c"></div>
+    <div class="fila">
+      <span style="font-family:var(--mono);font-size:12px">Desplazamiento: <b id="e1d">0</b></span>
+      <input type="range" id="e1r" min="0" max="25" value="0">
+      <button class="sec" id="e1auto">Probar los 25 automáticamente</button>
+    </div>
+    <div class="et">Resultado</div>
+    <div class="sal" id="e1s"></div>
+  </div>
+  <div class="panel" id="e1todos" style="display:none">
+    <div class="et">Los 25 desplazamientos posibles</div>
+    <div class="sal" id="e1lista" style="font-size:11.5px"></div>
+  </div>
+  <details><summary>Qué hay que anotar en el informe</summary>
+    <p>Cuántos intentos hicieron falta y cuánto tiempo tomó. Y la pregunta de fondo: <b>¿por qué este cifrado es indefendible aunque nadie conozca la llave?</b> La respuesta no es «porque es antiguo»: es porque el espacio de llaves tiene solo 25 opciones y se puede recorrer entero a mano.</p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 2 ───────────── -->
+<section id="e2">
+  <div class="sec-h"><div class="sec-n">Ejercicio 2 · 20 minutos</div><h2>Una sustitución</h2></div>
+  <p class="lead">Ahora cada letra fue reemplazada por otra cualquiera, no por un desplazamiento fijo. El espacio de llaves pasa de 25 a más de <b>4 × 10²⁶</b> posibilidades: cuatrocientos mil trillones de veces más grande. Y aun así va a caer en veinte minutos.</p>
+  <div class="panel">
+    <div class="et">Texto cifrado</div>
+    <div class="sal" id="e2c"></div>
+  </div>
+  <div class="dos">
+    <div class="panel">
+      <div class="et">Frecuencia de cada símbolo en el texto cifrado</div>
+      <div class="barra" id="e2barra"></div>
+      <div class="leyenda">Pase el cursor por encima para ver el porcentaje</div>
+    </div>
+    <div class="panel">
+      <div class="et">Frecuencia aproximada del español</div>
+      <table>
+        <tr><th>Letra</th><th>%</th><th>Letra</th><th>%</th></tr>
+        <tr><td><b>E</b></td><td>13,7</td><td><b>R</b></td><td>6,9</td></tr>
+        <tr><td><b>A</b></td><td>12,5</td><td><b>N</b></td><td>6,7</td></tr>
+        <tr><td><b>O</b></td><td>8,7</td><td><b>I</b></td><td>6,2</td></tr>
+        <tr><td><b>S</b></td><td>8,0</td><td><b>D</b></td><td>5,9</td></tr>
+        <tr><td><b>L</b></td><td>5,0</td><td><b>C</b></td><td>4,7</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="et">Escriba debajo de cada símbolo del texto cifrado la letra que cree que le corresponde</div>
+    <div class="sust" id="e2tabla"></div>
+    <div class="fila"><button class="sec" id="e2limpia">Limpiar</button><button class="sec" id="e2pista">Dar una pista</button><span id="e2estado" style="font-family:var(--mono);font-size:12px"></span></div>
+    <div class="et" style="margin-top:12px">Texto en claro según su correspondencia</div>
+    <div class="sal" id="e2s"></div>
+  </div>
+  <details><summary>Cómo se ataca esto, paso a paso</summary>
+    <p>1 · Cuente la frecuencia de cada símbolo del texto cifrado y ordénelos de mayor a menor. 2 · Compárelos con la tabla del español: el símbolo más frecuente suele ser la E o la A. 3 · Busque palabras de una y dos letras, que en español son pocas: «y», «a», «el», «la», «de», «en», «un». 4 · Use terminaciones frecuentes como «-ción», «-ando», «-mente». 5 · A partir de tres o cuatro letras correctas, el resto sale por contexto.</p>
+    <p><b>La lección de este ejercicio</b> es la más importante del bloque: un espacio de llaves enorme no sirve de nada si el cifrado conserva la estructura estadística del idioma. <b>Un espacio de llaves grande es necesario, pero nunca suficiente.</b></p>
+  </details>
+</section>
+
+<!-- ───────────── EJERCICIO 3 ───────────── -->
+<section id="e3">
+  <div class="sec-h"><div class="sec-n">Ejercicio 3 · 15 minutos</div><h2>Dos mensajes, una misma llave</h2></div>
+  <p class="lead">Estos dos textos cifrados se produjeron combinando cada mensaje con <b>la misma llave de flujo</b>, byte a byte. La llave es perfectamente aleatoria y ustedes no la conocen ni la van a conocer. Combine los dos textos cifrados entre sí y observe qué pasa.</p>
+  <div class="panel">
+    <div class="et">Texto cifrado 1 · hexadecimal</div>
+    <div class="sal" id="e3a" style="font-size:11.5px"></div>
+    <div class="et" style="margin-top:10px">Texto cifrado 2 · hexadecimal</div>
+    <div class="sal" id="e3b" style="font-size:11.5px"></div>
+    <div class="fila"><button id="e3xor">Combinar los dos textos cifrados</button><button class="sec" id="e3adiv">Probar una conjetura</button></div>
+    <div class="et">Resultado de combinarlos</div>
+    <div class="sal" id="e3s"></div>
+  </div>
+  <div class="panel" id="e3panel" style="display:none">
+    <div class="et">Conjeture una frase del mensaje 1 y vea qué aparece en el mensaje 2</div>
+    <input type="text" id="e3g" value="TRANSFERENCIA APROBADA" autocomplete="off">
+    <div class="et" style="margin-top:10px">Lo que se deduce del mensaje 2</div>
+    <div class="sal" id="e3r"></div>
+    <div class="leyenda" style="margin-top:8px">Si la conjetura es correcta, el mensaje 2 aparece legible en esa posición. Así se rompe, sin conocer jamás la llave.</div>
+  </div>
+  <details><summary>Por qué la llave desaparece</summary>
+    <p>Si <code>C1 = M1 ⊕ K</code> y <code>C2 = M2 ⊕ K</code>, entonces <code>C1 ⊕ C2 = M1 ⊕ M2</code>. La llave se cancela consigo misma y queda una relación directa entre los dos mensajes en claro. A partir de ahí, conjeturar una parte de uno revela la parte correspondiente del otro.</p>
+    <p><b>Esto no es historia.</b> Es la tercera condición del cuaderno de un solo uso, y el mismo error reaparece con AES cuando se repite el vector de inicialización o el contador, y con firma digital cuando se repite el número que debe ser único. Un solo error con tres disfraces.</p>
+  </details>
+</section>
+
+<!-- ───────────── DEMO 2 ───────────── -->
+<section id="d2">
+  <div class="sec-h"><div class="sec-n">Demostración 2</div><h2>De dónde sale una llave</h2></div>
+  <p class="lead">Los dos primeros botones piden los bytes al generador criptográfico de su navegador. El tercero hace lo que hace <code>random.seed(2019)</code> en Python: los calcula con una fórmula que siempre arranca del mismo número. Pulse los tres varias veces y mire cuál se repite.</p>
+  <div class="panel">
+    <div class="fila"><button id="genk">Generar una llave de 256 bits</button><button class="sec" id="geniv">Generar un vector de 128 bits</button><button class="sec" id="gensem">Generar con un generador sembrado</button></div>
+    <div class="sal" id="ksal">Pulse un botón…</div>
+    <div class="leyenda" style="margin-top:10px">Las dos primeras líneas nunca se repiten. La tercera es siempre la misma, en esta máquina y en cualquier otra.</div>
+  </div>
+  <details><summary>Por qué el tercer botón siempre da lo mismo</summary>
+    <p>Un computador no inventa azar: calcula. Un generador <b>sembrado</b> aplica una fórmula a partir de un número inicial, la semilla. Misma semilla, misma secuencia, siempre, en cualquier computador y en cualquier momento. Eso no es un defecto: es para lo que existe. Si usted simula el tráfico de un cajero y necesita repetir el experimento idéntico, fija la semilla.</p>
+    <p>El otro generador no calcula el número: se lo pide al sistema operativo, que lo arma con entropía física —tiempos entre interrupciones, ruido del hardware, el generador de la CPU—. No hay fórmula que repetir, así que no hay manera de volver a obtener el mismo valor.</p>
+    <p><b>Por eso importa:</b> una llave de 128 bits que sale de una fórmula no vale 128 bits. Vale lo que valga la semilla. Si el programador sembró con la hora del momento, son 86.400 semillas posibles —una por segundo del día— y probarlas todas toma menos de un segundo.</p>
+    <p><b>Esto ya pasó.</b> En 2008 un parche a OpenSSL en Debian eliminó por error casi todas las fuentes de entropía de la semilla, que quedó dependiendo del identificador del proceso: unos 32.768 valores. Todas las llaves SSH y SSL generadas durante casi dos años se podían enumerar en una lista. El algoritmo era correcto, el tamaño de llave era correcto, la implementación era correcta. La semilla no.</p>
+    <p><b>Regla para revisar código:</b> si en un archivo que genera llaves, tokens o contraseñas aparece <code>import random</code>, eso es un hallazgo. En Python se usa <code>secrets</code>; en el navegador, <code>crypto.getRandomValues</code>. Y ojo: <code>random</code> tampoco sirve aunque nunca se llame a <code>seed()</code> — sigue siendo una fórmula, y a quien vea suficientes salidas le basta para predecir todas las siguientes.</p>
+  </details>
+  <div class="panel">
+    <div class="et">Compare la entropía de distintos orígenes</div>
+    <table>
+      <tr><th>Origen de la llave</th><th>Entropía real</th><th>Intentos necesarios</th></tr>
+      <tr><td><b>Un PIN de 4 dígitos</b></td><td>unos 13 bits</td><td>10.000</td></tr>
+      <tr><td><b>Una palabra del diccionario</b></td><td>unos 15 bits</td><td>decenas de miles</td></tr>
+      <tr><td><b>«Cb4rr4-2023-HMAC-k3y»</b></td><td><span class="mal">cero, una vez publicada</span></td><td>1 · está dentro de la aplicación</td></tr>
+      <tr><td><b>Contraseña humana de 8 caracteres</b></td><td>25 a 30 bits en la práctica</td><td>horas con una tarjeta gráfica</td></tr>
+      <tr><td><b>32 bytes de un generador sembrado con la hora</b></td><td><span class="mal">unos 17 bits</span></td><td>86.400 · menos de un segundo</td></tr>
+      <tr><td><b>32 bytes del generador de arriba</b></td><td><span class="ok">256 bits</span></td><td>inalcanzable con tecnología clásica</td></tr>
+    </table>
+    <div class="leyenda" style="margin-top:10px">La entropía no la da la longitud del texto, sino lo que el adversario no sabe. Una llave de veinte caracteres publicada vale menos que un PIN.</div>
+  </div>
+</section>
+
+<!-- ───────────── EJERCICIO 4 ───────────── -->
+<section id="e4">
+  <div class="sec-h"><div class="sec-n">Repaso · 5 minutos</div><h2>¿Qué servicio falló?</h2></div>
+  <p class="lead">Seis situaciones. En algunas falló más de un servicio, y en tres no falló ninguno.</p>
+  <div id="quiz"></div>
+  <div class="fila"><button id="qver">Ver respuestas</button><button class="sec" id="qreset">Reiniciar</button><span id="qmarca" style="font-family:var(--mono);font-size:12.5px"></span></div>
+</section>
+
+<footer>
+  <span>Institución Universitaria de Envigado · Facultad de Ingeniería</span>
+  <span>SIO0010 · Técnicas Criptográficas · Laboratorio 1</span>
+</footer>
+</div>
+
+<script>
+const D = DATOS_JSON;
+const AB = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const $ = id => document.getElementById(id);
+
+/* ---------- Ejercicio 1 · César ---------- */
+$("e1c").textContent = D.e1.cifrado;
+function cesar(t, d){ return [...t].map(c => c === " " ? " " : AB[(AB.indexOf(c) - d + 26) % 26]).join(""); }
+function pintaE1(){ const d = +$("e1r").value; $("e1d").textContent = d; $("e1s").textContent = cesar(D.e1.cifrado, d); }
+$("e1r").addEventListener("input", pintaE1); pintaE1();
+$("e1auto").addEventListener("click", () => {
+  const p = $("e1todos"); p.style.display = "block";
+  $("e1lista").textContent = Array.from({length:26}, (_,d) =>
+    String(d).padStart(2,"0") + " · " + cesar(D.e1.cifrado, d).slice(0,64)).join("\n");
+});
+
+/* ---------- Ejercicio 2 · sustitución ---------- */
+$("e2c").textContent = D.e2.cifrado;
+const simbolos = [...new Set(D.e2.cifrado.replace(/ /g,""))].sort();
+function frec(t){
+  const c = {}; let n = 0;
+  for (const ch of t) if (ch !== " ") { c[ch] = (c[ch]||0)+1; n++; }
+  return Object.entries(c).map(([k,v]) => [k, v*100/n]).sort((a,b) => b[1]-a[1]);
+}
+(function barras(){
+  const f = frec(D.e2.cifrado), max = f[0][1], cont = $("e2barra");
+  f.forEach(([ch,pc],i) => {
+    const d = document.createElement("div");
+    d.style.height = Math.max(2, pc/max*100) + "%";
+    if (i < 3) d.className = "alta";
+    d.title = ch + ": " + pc.toFixed(1) + "%";
+    d.innerHTML = "<span>" + ch + "</span>";
+    cont.appendChild(d);
+  });
+})();
+const mapa = {};
+(function tablaSust(){
+  const cont = $("e2tabla");
+  simbolos.forEach(ch => {
+    const w = document.createElement("div");
+    w.innerHTML = '<label>' + ch + '</label><input maxlength="1" data-s="' + ch + '">';
+    cont.appendChild(w);
+  });
+  cont.addEventListener("input", e => {
+    const s = e.target.dataset.s; if (!s) return;
+    const v = e.target.value.toUpperCase().replace(/[^A-Z]/g,"");
+    e.target.value = v;
+    if (v) mapa[s] = v; else delete mapa[s];
+    pintaE2();
+  });
+})();
+function pintaE2(){
+  $("e2s").textContent = [...D.e2.cifrado].map(c => c === " " ? " " : (mapa[c] || "·")).join("");
+  const total = simbolos.length;
+  const ok = simbolos.filter(s => mapa[s] === D.e2.tabla_inv[s]).length;
+  $("e2estado").innerHTML = ok ? '<span class="ok">' + ok + " de " + total + " correctas</span>" : "";
+}
+$("e2limpia").addEventListener("click", () => {
+  Object.keys(mapa).forEach(k => delete mapa[k]);
+  document.querySelectorAll("#e2tabla input").forEach(i => i.value = "");
+  pintaE2();
+});
+$("e2pista").addEventListener("click", () => {
+  const falta = simbolos.filter(s => mapa[s] !== D.e2.tabla_inv[s]);
+  if (!falta.length) return;
+  const s = falta[0];
+  mapa[s] = D.e2.tabla_inv[s];
+  const inp = document.querySelector('#e2tabla input[data-s="' + s + '"]');
+  if (inp) inp.value = mapa[s];
+  pintaE2();
+});
+pintaE2();
+
+/* ---------- Ejercicio 3 · llave repetida ---------- */
+$("e3a").textContent = D.e3.c1;
+$("e3b").textContent = D.e3.c2;
+const hex2b = h => new Uint8Array(h.match(/../g).map(x => parseInt(x,16)));
+$("e3xor").addEventListener("click", () => {
+  const a = hex2b(D.e3.c1), b = hex2b(D.e3.c2);
+  const x = [...a].map((v,i) => v ^ b[i]);
+  $("e3s").textContent =
+    "En hexadecimal:\n" + x.map(v => v.toString(16).padStart(2,"0")).join("") +
+    "\n\nLa llave desapareció: esto es M1 ⊕ M2, la relación directa entre los dos mensajes en claro.";
+});
+$("e3adiv").addEventListener("click", () => { $("e3panel").style.display = "block"; adivina(); });
+function adivina(){
+  const g = $("e3g").value.toUpperCase();
+  const a = hex2b(D.e3.c1), b = hex2b(D.e3.c2);
+  let out = "";
+  for (let i = 0; i < g.length && i < a.length; i++) {
+    const c = (a[i] ^ b[i] ^ g.charCodeAt(i));
+    out += (c >= 32 && c < 127) ? String.fromCharCode(c) : "·";
+  }
+  $("e3r").textContent = out || "—";
+}
+$("e3g").addEventListener("input", adivina);
+
+/* ---------- Demo 2 · llaves ---------- */
+function aleatoria(n){
+  const b = new Uint8Array(n); crypto.getRandomValues(b);
+  return [...b].map(v => v.toString(16).padStart(2,"0")).join("");
+}
+/* El equivalente en el navegador de random.seed(2019): una fórmula determinista.
+   Misma semilla, misma salida, siempre y en cualquier máquina. */
+function sembrada(n, semilla){
+  let x = semilla >>> 0, y = 362436069, z = 521288629, w = 88675123;
+  const b = new Uint8Array(n);
+  for (let i = 0; i < n; i++){
+    const t = x ^ (x << 11);
+    x = y; y = z; z = w;
+    w = (w ^ (w >>> 19)) ^ (t ^ (t >>> 8));
+    b[i] = w & 255;
+  }
+  return [...b].map(v => v.toString(16).padStart(2,"0")).join("");
+}
+let hist = [];
+function muestra(t, v, malo){
+  hist.unshift({t: t, v: v, malo: !!malo}); hist = hist.slice(0,6);
+  $("ksal").innerHTML = hist.map(l => {
+    const linea = l.t + ": " + l.v;
+    return l.malo ? '<span class="mal">' + linea + '</span>' : linea;
+  }).join("\n");
+}
+$("genk").addEventListener("click", () => muestra("llave    (32 bytes)", aleatoria(32)));
+$("geniv").addEventListener("click", () => muestra("vector   (16 bytes)", aleatoria(16)));
+$("gensem").addEventListener("click", () => muestra("sembrado (semilla 2019)", sembrada(16, 2019), true));
+
+/* ---------- Ejercicio 4 · quiz ---------- */
+const PREG = [
+ ["Un proveedor recibe un correo, aparentemente del gerente, pidiendo cambiar la cuenta bancaria del próximo pago. Lo hace y el dinero se pierde.",
+  "Autenticidad", "El correo no estaba firmado: no hay forma de establecer quién lo originó. Es el fraude más común del país y no se resuelve cifrando."],
+ ["Un disco con la base de datos de clientes se pierde en un taxi. Estaba cifrado con una llave que solo conoce el área de sistemas.",
+  "Ninguno", "La confidencialidad se mantuvo. Aquí la criptografía funcionó: lo que hay es un problema de custodia del medio, no criptográfico."],
+ ["Una factura electrónica llega con el valor modificado. El emisor jura que envió otro valor y no hay forma de saber quién tiene razón.",
+  "Integridad y no repudio", "No se detecta la alteración ni se puede probar quién dice la verdad. Es exactamente el escenario de la Ley 527."],
+ ["Un empleado descarga la lista de salarios desde la base de nómina, a la que tiene acceso legítimo de lectura.",
+  "Ninguno", "El acceso era legítimo. Ningún mecanismo criptográfico detiene a quien tiene permiso: esto es control de acceso."],
+ ["Un cliente niega haber autorizado una transferencia. El banco muestra el registro del sistema. El cliente responde que ese registro lo hizo el banco.",
+  "No repudio", "El registro lo produce una sola parte, así que no es oponible ante un tercero. Es, literalmente, el caso Coopaburrá."],
+ ["Alguien intercepta el tráfico entre la aplicación y el servidor. Va cifrado con TLS 1.3 y no logra leer nada.",
+  "Ninguno", "Funcionó la confidencialidad en tránsito. Sirve para recordar que la criptografía hace bien su trabajo cuando está bien puesta."]
+];
+const OPC = ["Confidencialidad","Integridad","Autenticidad","No repudio","Integridad y no repudio","Ninguno"];
+(function quiz(){
+  const cont = $("quiz");
+  PREG.forEach((p, i) => {
+    const d = document.createElement("div"); d.className = "preg";
+    d.innerHTML = '<div class="q">' + (i+1) + " · " + p[0] + '</div><div class="ops">' +
+      OPC.map(o => '<button data-p="' + i + '" data-o="' + o + '">' + o + "</button>").join("") +
+      '</div><div class="fb" id="fb' + i + '"></div>';
+    cont.appendChild(d);
+  });
+  cont.addEventListener("click", e => {
+    const b = e.target.closest("button[data-o]"); if (!b) return;
+    const i = +b.dataset.p;
+    b.parentElement.querySelectorAll("button").forEach(x => x.classList.remove("elegida"));
+    b.classList.add("elegida");
+    const fb = $("fb" + i), bien = b.dataset.o === PREG[i][1];
+    fb.style.display = "block";
+    fb.innerHTML = bien
+      ? '<span class="ok">Correcto.</span> ' + PREG[i][2]
+      : '<span class="mal">No.</span> La respuesta es <b>' + PREG[i][1] + "</b>. " + PREG[i][2];
+    marca();
+  });
+})();
+function marca(){
+  const n = PREG.filter((p,i) => {
+    const s = document.querySelector('#quiz .preg:nth-child(' + (i+1) + ') button.elegida');
+    return s && s.dataset.o === p[1];
+  }).length;
+  $("qmarca").textContent = n + " de " + PREG.length + " correctas";
+}
+$("qver").addEventListener("click", () => {
+  PREG.forEach((p,i) => {
+    const fb = $("fb" + i); fb.style.display = "block";
+    fb.innerHTML = "Respuesta: <b>" + p[1] + "</b>. " + p[2];
+  });
+});
+$("qreset").addEventListener("click", () => {
+  document.querySelectorAll("#quiz button.elegida").forEach(b => b.classList.remove("elegida"));
+  document.querySelectorAll("#quiz .fb").forEach(f => { f.style.display = "none"; f.innerHTML = ""; });
+  $("qmarca").textContent = "";
+});
+</script>
