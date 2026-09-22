@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIO0010 · Técnicas Criptográficas</title>
+<style>
+:root{
+  --naranja:#F36406; --naranja-lav:#FDEFE9; --azul:#154361; --azul-lav:#E9F0F5;
+  --tinta:#15171C; --tinta-2:#4A505C; --gris:#5C5C5C; --papel:#FFFFFF; --papel-2:#F4F4F4;
+  --linea:#D8DBDF; --linea-suave:#E9EBEE;
+  --mono:"Consolas","Cascadia Mono",ui-monospace,monospace;
+  --sans:Arial,Helvetica,sans-serif; --titular:"Arial Black",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel-2);color:var(--tinta);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px 80px;background:var(--papel);min-height:100vh}
+header{padding:30px 0 0}
+.regla{height:5px;background:var(--tinta);margin:14px 0 12px}
+.kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.20em;text-transform:uppercase;color:var(--gris)}
+h1{font-family:var(--titular);font-size:34px;line-height:1.1;margin:8px 0 12px;letter-spacing:-.01em}
+.lead{font-size:16px;color:var(--tinta-2);max-width:70ch}
+h2{font-family:var(--titular);font-size:20px;margin:38px 0 4px;border-top:4px solid var(--tinta);padding-top:12px}
+.sub{font-size:13px;color:var(--gris);margin-bottom:14px}
+.rej{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:720px){.rej{grid-template-columns:1fr}}
+a.card{display:block;border:1px solid var(--linea);border-radius:4px;padding:15px 17px;text-decoration:none;color:inherit;background:var(--papel);transition:border-color .15s}
+a.card:hover{border-color:var(--naranja)}
+a.card .n{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--naranja)}
+a.card .t{font-weight:700;margin:5px 0 3px;font-size:16px}
+a.card .d{font-size:13px;color:var(--tinta-2)}
+.enl{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.enl a{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;text-decoration:none;color:var(--azul);border:1px solid var(--linea);border-radius:3px;padding:7px 12px}
+.enl a:hover{color:var(--naranja);border-color:var(--naranja)}
+.nota{border-left:4px solid var(--azul);background:var(--azul-lav);padding:12px 16px;margin:22px 0;font-size:13.5px;color:var(--tinta-2)}
+footer{margin-top:50px;border-top:1px solid var(--linea);padding-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="regla"></div>
+  <div class="kicker">Institución Universitaria de Envigado · Facultad de Ingeniería</div>
+  <h1>Técnicas Criptográficas · SIO0010</h1>
+  <p class="lead">Especialización en Seguridad de la Información de las Organizaciones. Seis encuentros sobre un caso continuo: Coopaburrá, una cooperativa financiera ficticia. Cada laboratorio ataca un hallazgo del caso.</p>
+</header>
+
+<h2>Laboratorios</h2>
+<div class="sub">Se abren en el navegador, sin instalar nada y sin conexión. Un clic para usarlos aquí, o descárguenlos para trabajar sin red.</div>
+<div class="rej">
+  <a class="card" href="laboratorios/Laboratorio-1-SIO0010.html"><div class="n">Laboratorio 1 · Sesión 1</div><div class="t">Demostraciones y ejercicios</div><div class="d">Cifrados clásicos, modos de operación y de dónde sale una llave.</div></a>
+  <a class="card" href="laboratorios/Laboratorio-2-SIO0010.html"><div class="n">Laboratorio 2 · Sesión 2</div><div class="t">Modos de operación y la línea de Coopaburrá</div><div class="d">ECB frente a CBC, alterar un byte, auditar la evidencia C.</div></a>
+  <a class="card" href="laboratorios/Laboratorio-3-SIO0010.html"><div class="n">Laboratorio 3 · Sesión 3</div><div class="t">Auditar la evidencia B</div><div class="d">Resúmenes, sal y el costo de un ataque a contraseñas.</div></a>
+  <a class="card" href="laboratorios/Laboratorio-4-SIO0010.html"><div class="n">Laboratorio 4 · Sesión 4</div><div class="t">Firmar, verificar y medir</div><div class="d">Firma digital, RSA frente a curva elíptica, y qué prueba una firma.</div></a>
+  <a class="card" href="laboratorios/Laboratorio-5-SIO0010.html"><div class="n">Laboratorio 5 · Sesión 5</div><div class="t">Inspeccionar, construir y romper una cadena</div><div class="d">Certificados, autoridades y la cadena de confianza.</div></a>
+  <a class="card" href="laboratorios/Laboratorio-6-SIO0010.html"><div class="n">Laboratorio 6 · Sesión 6</div><div class="t">Repartir, rotar y tokenizar</div><div class="d">Reparto de secreto, rotación de llave maestra y tokenización.</div></a>
+</div>
+
+<h2>Caso y guías</h2>
+<div class="enl">
+  <a href="caso/Caso-Coopaburra-SIO0010.pdf">Caso Coopaburrá (PDF)</a>
+  <a href="guias/Guia-Inventario-criptografico-SIO0010.pdf">Guía · Inventario criptográfico (PDF)</a>
+</div>
+
+<h2>Presentaciones</h2>
+<div class="enl">
+  <a href="presentaciones/SIO0010-S1-Tecnicas-criptograficas.pdf">Sesión 1 (PDF)</a>
+  <a href="presentaciones/SIO0010-S2-Cifrado-simetrico.pdf">Sesión 2 (PDF)</a>
+  <a href="presentaciones/SIO0010-S3-Resumenes-y-contrasenas.pdf">Sesión 3 (PDF)</a>
+  <a href="presentaciones/SIO0010-S4-Llave-publica-y-firma.pdf">Sesión 4 (PDF)</a>
+  <a href="presentaciones/SIO0010-S5-Certificados-y-canal-seguro.pdf">Sesión 5 (PDF)</a>
+  <a href="presentaciones/SIO0010-S6-Gestion-de-llaves-y-transicion.pdf">Sesión 6 (PDF)</a>
+</div>
+
+<div class="nota"><b>Coopaburrá no existe.</b> Es un caso construido para este módulo. Las cifras, personas y documentos son verosímiles pero no corresponden a ninguna entidad real. Las cédulas de los ejercicios son inventadas.</div>
+
+<footer>Institución Universitaria de Envigado · Facultad de Ingeniería · Material bajo licencia CC BY-SA 4.0</footer>
+</div>
+</body>
+</html>

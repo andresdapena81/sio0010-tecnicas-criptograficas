@@ -4,6 +4,9 @@ Material del módulo **Técnicas Criptográficas** de la **Especialización en S
 
 El módulo se dicta sobre un caso de estudio continuo —**Coopaburrá**, una cooperativa financiera ficticia— y se organiza en seis encuentros de cinco horas. Cada encuentro tiene un laboratorio que ataca un hallazgo concreto del caso, y todo el trabajo alimenta un único producto final: un informe de aseguramiento criptográfico.
 
+> **Sitio del curso:** los laboratorios se abren con un clic en
+> **https://andresdapena81.github.io/sio0010-tecnicas-criptograficas/**
+
 ---
 
 ## Cómo se usan los laboratorios
