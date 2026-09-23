@@ -705,7 +705,7 @@ y = tabla(s, y, ["SECCIÓN", "QUÉ DEBE CONTENER"], [
     [("Cierre del rediseño de la firma · H2", {"bold": True}), "Esquema con llave privada por dispositivo: cómo se genera, dónde vive, qué conoce el servidor, qué se firma exactamente y qué pasa cuando el asociado cambia de teléfono"],
     [("Qué se conserva del esquema actual", {"bold": True}), "No todo se bota. Hay usos donde un código de autenticación con llave compartida sigue siendo adecuado; digan cuáles y por qué"],
     [("Plan de choque de certificados · H5", {"bold": True}), "Con la evidencia del caso: qué certificados existen, quién responde por cada uno, qué se hace antes del 14 de junio y qué se hace con la autoridad interna. El martes se corrige y se afina"],
-    [("Custodia de las llaves de los cajeros · H6", {"bold": True}), "Quién custodia, con qué doble control y con qué registro de ceremonia. Es el punto de partida de la política que se cierra en la sesión 6"],
+    [("Custodia de las llaves de los cajeros · H6", {"bold": True}), "El anexo técnico las identifica como 3DES cargadas a mano en 2019, sin rotación. Definan quién custodia, con qué doble control y con qué registro de ceremonia. Es el punto de partida de la política que se cierra en la sesión 6"],
 ], [3.4, 6.6], alto_fila=0.54)
 nota(s, y, "// LO DE LAS HIPOTECAS NO VA EN ESTA ENTREGA",
      "H7 quedó planteado hoy con todo lo necesario para entenderlo, pero se cierra en la parte 5, cuando tengan "

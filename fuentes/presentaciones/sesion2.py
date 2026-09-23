@@ -65,7 +65,7 @@ s, y = base(p, "// 03  ENTREGA", "REVISIÓN CRUZADA DEL INVENTARIO", sig())
 y = intro(s, y, "Treinta minutos. Cada equipo intercambia su inventario con otro equipo y lo revisa con esta lista. "
                 "No se trata de corregir: se trata de encontrar lo que el otro equipo vio y ustedes no.")
 y = pasos(s, y, [
-    ("¿Aparecen los siete sistemas de la Parte 3 del caso?", "Core, portal, aplicación, cajeros, procesador, gestor documental y respaldos. Si falta alguno, ¿por qué?"),
+    ("¿Aparecen los ocho sistemas de la Parte 3 del caso?", "Core, portal, aplicación, cajeros, procesador, gestor documental, respaldos, y correo y directorio. Si falta alguno, ¿por qué?"),
     ("¿Cada entrada dice cuál de los cuatro servicios pretende dar?", "Es la columna que más se olvida y la que conecta con la sesión del martes."),
     ("¿Las casillas desconocidas están marcadas como desconocidas?", "O están en blanco, que es distinto y peor: en blanco parece que no aplica."),
     ("¿Cada llave tiene un responsable con nombre y cargo?", "De la Parte 2 del caso. «Infraestructura» no es un responsable: es un área."),

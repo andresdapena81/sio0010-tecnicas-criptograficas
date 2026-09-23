@@ -860,31 +860,33 @@ pasos(s, y + 0.05, [
 ])
 
 s, y = base(p, "// 54  ENTREGA", "PRIMERA PARTE DEL PRODUCTO", sig())
-y = intro(s, y, "Se entrega al inicio de la sesión 2. Es el hallazgo H8 y la base de todo lo que sigue.")
-y = tabla(s, y, ["COLUMNA DEL INVENTARIO", "QUÉ SE REGISTRA", "DÓNDE ESTÁ EN EL CASO"], [
-    [("Dónde está la criptografía", {"bold": True}), "Sistema, canal o proceso donde se usa", "Parte 3 del documento del caso"],
+y = intro(s, y, "Se entrega al inicio de la sesión 2. Es el hallazgo H8 y la base de todo lo que sigue. La guía de "
+                "la entrega explica cómo llenar cada columna.")
+y = tabla(s, y, ["COLUMNA DEL INVENTARIO", "QUÉ SE REGISTRA", "DÓNDE SALE EL DATO"], [
+    [("Dónde está la criptografía", {"bold": True}), "Sistema, canal o proceso donde se usa", "Parte 3 del caso"],
     [("Para qué sirve ahí", {"bold": True}), "Cuál de los cuatro servicios pretende dar", "Lo deducen ustedes"],
-    [("Qué algoritmo y qué versión", {"bold": True}), "Nombre, modo y longitud; «desconocido» es respuesta válida y reveladora", "Partes 3 y 8"],
-    [("Qué llave lo protege", {"bold": True}), "Cuántas hay, quién las conoce, dónde se guardan", "Partes 7 y 8"],
+    [("Qué algoritmo y qué versión", {"bold": True}), "Nombre, modo y longitud; «desconocido» es respuesta válida y reveladora", "Partes 3 y 8 · anexo técnico"],
+    [("Qué llave lo protege", {"bold": True}), "Cuántas hay, quién las conoce, dónde se guardan", "Partes 7 y 8 · anexo técnico"],
     [("Quién responde por ella", {"bold": True}), "Nombre y cargo de la Parte 2 del caso", "Parte 2"],
-    [("Cuándo vence o se rota", {"bold": True}), "Fecha conocida o «nunca se ha rotado»", "Partes 7 y 10"],
+    [("Cuándo vence o se rota", {"bold": True}), "Fecha conocida o «nunca se ha rotado»", "Partes 7 y 10 · anexo"],
 ], [3.4, 4.6, 2.0], alto_fila=0.40)
 nota(s, y, "// CRITERIO DE EVALUACIÓN",
      "No se evalúa que esté completo: es imposible completarlo. Se evalúa que <b>las casillas vacías estén "
-     "marcadas como desconocidas</b> y que se diga a quién preguntarle.", alto=0.72)
+     "marcadas como desconocidas</b> y que se diga a quién preguntarle. El <b>anexo técnico</b> del caso trae, por "
+     "sistema, el algoritmo y la llave que la Parte 3 no detalla.", alto=0.92)
 
 trabajo_independiente(p, "// 55  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SESIÓN 2"], [
     ("8 h", "TOTAL ENTRE", "MARTES Y JUEVES", False),
     ("3,5 h", "LECTURA", "PREVIA", False),
     ("4,5 h", "INVENTARIO E INFORME", "DEL LABORATORIO 1", True),
 ], [
-    ("El caso Coopaburrá", "Las catorce páginas, 1,5 horas. El jueves se asume leído, en especial las partes 7, 8 y 10, que alimentan el inventario."),
+    ("El caso Coopaburrá y su anexo técnico", "Las catorce páginas del caso más el anexo, que trae la evidencia por sistema. 1,5 horas. El jueves se asume leído, en especial las partes 3, 7, 8 y 10 y el anexo, que alimentan el inventario."),
     ("Katz y Lindell (2020)", "Introduction to Modern Cryptography, capítulos 1 y 2: cifrados clásicos, principios de la criptografía moderna y secreto perfecto. Una hora."),
     ("NIST SP 800-38A", "Recommendation for Block Cipher Modes of Operation, sección 6: los modos ECB, CBC y CTR. Una hora. Es la base del bloque 3."),
 ], "// CONDICIÓN DE ENTRADA A LA SESIÓN 2",
    "El jueves no se explica qué es un modo de operación: se discute cuál escoger. Las 4,5 horas de elaboración son "
-   "el inventario (3 h, en equipo) y el cierre del informe del laboratorio (1,5 h). El quiz 1 incluye preguntas "
-   "sobre estas lecturas.", sig(), titulo_lecturas="Lectura previa · 3,5 horas")
+   "el inventario (3 h, en equipo, con la guía de la entrega) y el cierre del informe del laboratorio (1,5 h). El "
+   "quiz 1 incluye preguntas sobre estas lecturas.", sig(), titulo_lecturas="Lectura previa · 3,5 horas")
 
 s, y = base(p, "// 56  ADELANTO", "LO QUE VIENE EL JUEVES", sig())
 y = intro(s, y, "Sesión 2: cifrado simétrico. El bloque más práctico del módulo y el que ataca directamente dos "

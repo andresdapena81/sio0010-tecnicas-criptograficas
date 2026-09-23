@@ -538,8 +538,8 @@ y = tabla(s, y, ["TECNOLOGÍA", "DÓNDE APARECE", "QUÉ HAY QUE REVISAR"], [
     [("WireGuard", {"bold": True}), "Instalaciones más recientes", "Una llave por equipo, sin negociación: sencillo, pero cada llave hay que gestionarla"],
 ], [2.6, 3.2, 4.2], alto_fila=0.56)
 nota(s, y, "// UNA PREGUNTA PARA EL INFORME",
-     "El caso no documenta cómo se conectan los 32 cajeros al centro de datos. <b>Si lo hacen con una llave "
-     "compartida por todos</b>, es el mismo patrón de H2 y de H6, y hay que decirlo.", alto=0.78)
+     "El anexo técnico identifica las llaves de los cajeros como 3DES cargadas a mano en 2019, sin rotación. <b>Si "
+     "además se conectan con una llave compartida por todos</b>, es el mismo patrón de H2 y de H6, y hay que decirlo.", alto=0.78)
 
 seccion(p, "05", "EL HALLAZGO H5",
         "Una autoridad certificadora, un computador sin dueño y una fecha", sig())
