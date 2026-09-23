@@ -17,7 +17,7 @@ Los laboratorios son **archivos HTML autocontenidos**. Se descargan y se abren c
 - **No instalan nada** y **no envían información a ningún servidor.**
 - Las partes que sí necesitan la máquina —OpenSSL, Python— traen los comandos listos, con botón de copiar.
 
-Para descargar un laboratorio: entren al archivo en la carpeta [`laboratorios/`](laboratorios/), pulsen el botón **Download raw file**, y ábranlo. También se pueden imprimir a PDF desde el navegador (Ctrl+P): la hoja de impresión está preparada para eso.
+Para descargar un laboratorio: entren al archivo en la carpeta [`laboratorios/`](laboratorios/), pulsen el botón **Download raw file**, y ábranlo. Cada laboratorio está también en **PDF imprimible** en la misma carpeta (`Laboratorio-N-SIO0010.pdf`), por si se necesita en papel; la versión interactiva es la HTML.
 
 | # | Laboratorio | Sesión | Ataca |
 |---|-------------|--------|-------|
