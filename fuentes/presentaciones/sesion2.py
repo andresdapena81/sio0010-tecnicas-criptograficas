@@ -104,11 +104,40 @@ nota(s, y, "// EL PATRÓN QUE HAY QUE NOMBRAR",
      "por dónde vive la llave y quién la tiene. <b>La criptografía de Coopaburrá funciona sin que nadie la gobierne.</b> "
      "Por eso el inventario es la entrega 1 y no la 6, y por eso «desconocido» y «ninguno» son respuestas, no vacíos.", alto=1.02)
 
+s, y = base(p, "// 06  REALIDAD", "EL MISMO EJERCICIO, EN UNA ORGANIZACIÓN REAL", sig(), titulo_tam=23)
+y = intro(s, y, "Coopaburrá tiene ocho sistemas; una organización real tiene cientos. El inventario se topa con "
+                "estos muros. Ninguno es excusa para no hacerlo: cada uno tiene una salida.")
+y = tabla(s, y, ["EL MURO", "CÓMO SE AFRONTA"], [
+    [("«Nadie sabe»", {"bold": True}), "Quien lo montó ya no está y no hay documentación. No se inventa el dato: se marca «desconocido», se nombra a quién preguntar y se reconstruye leyendo configuraciones, tráfico y código. En el caso, la CA en el escritorio del ex contratista."],
+    [("Son cientos, no ocho", {"bold": True}), "No se hace a mano. Descubrimiento automático —escáneres de TLS, registros de transparencia de certificados, escaneo de secretos en el código— y se prioriza por la sensibilidad del dato, no por el sistema."],
+    [("Cajas negras de terceros", {"bold": True}), "El proveedor no divulga cómo cifra. Se exige su certificación (PCI, SOC 2, ISO 27001) y se registra bajo responsabilidad compartida. En el caso, el procesador de tarjetas y el correo en la nube."],
+    [("Criptografía escondida", {"bold": True}), "Llaves incrustadas en el código, en librerías, en dispositivos. Casi nunca está donde dice el diagrama: se encuentra con análisis del código y de dependencias, no preguntando."],
+    [("El inventario nace viejo", {"bold": True}), "Todo cambia al día siguiente. No es un documento, es un proceso vivo, con dueño y re-escaneo periódico, atado al control de cambios."],
+], [2.6, 8.25], alto_fila=0.66)
+
+s, y = base(p, "// 07  MÉTODO", "CÓMO SE VUELVE VIABLE, Y POR QUÉ YA NO ES OPCIONAL", sig(), titulo_tam=22)
+y = intro(s, y, "Lo que hace practicable el inventario a escala, y la razón por la que dejó de ser un lujo de las "
+                "organizaciones grandes.")
+y = tarjetas(s, y, [
+    ("// DESCÚBRELO, NO LO ADIVINES", [
+        "Escáneres de TLS, registros de transparencia de certificados y escaneo de secretos en el repositorio "
+        "encuentran en horas lo que a mano tomaría meses. La entrevista confirma; no descubre."]),
+    ("// PRIORIZA POR EL DATO", [
+        "Primero se clasifican los datos y se empieza por lo regulado: personales, tarjetas, salud. Querer "
+        "inventariarlo todo a la vez es no terminar ninguno."]),
+    ("// HAZLO LEGIBLE POR MÁQUINA", [
+        "Un inventario criptográfico en formato estándar —el CBOM de CycloneDX— se genera en el pipeline y se "
+        "actualiza solo. Deja de ser una foto que envejece."]),
+    ("// LA RAZÓN DE FONDO ES 2030", [
+        "La migración post-cuántica obliga a saber dónde está cada algoritmo: no se puede migrar lo que no se ha "
+        "encontrado. El inventario de hoy es el mapa de esa transición, que verán en la sesión 6."]),
+], alto=1.72)
+
 # ─────────────── SECCIÓN 02 · CIFRADO SIMÉTRICO ─────────────
 seccion(p, "02", "CIFRADO SIMÉTRICO",
         "Una sola llave para cifrar y descifrar · AES y los modos de operación", sig())
 
-s, y = base(p, "// 06  FUNDAMENTO", "UNA SOLA LLAVE PARA LAS DOS COSAS", sig())
+s, y = base(p, "// 08  FUNDAMENTO", "UNA SOLA LLAVE PARA LAS DOS COSAS", sig())
 y = intro(s, y, "Cifrado simétrico significa que la misma llave sirve para cifrar y para descifrar. Es rápido, "
                 "maduro y es el que protege la inmensa mayoría de los datos del mundo. Su límite es de logística, "
                 "no de matemáticas.")
@@ -123,7 +152,7 @@ y = dos_columnas(s, y,
         "Y como ambas la tienen, ninguna puede probar ante un tercero qué hizo la otra: por eso el cifrado simétrico nunca da no repudio."]),
     alto=2.25)
 
-s, y = base(p, "// 07  HISTORIA", "DE DES A AES: POR QUÉ HUBO QUE CAMBIAR", sig())
+s, y = base(p, "// 09  HISTORIA", "DE DES A AES: POR QUÉ HUBO QUE CAMBIAR", sig())
 y = intro(s, y, "DES fue el estándar durante veinte años. Su algoritmo nunca se rompió de forma práctica: lo que se "
                 "volvió insuficiente fue el tamaño de su llave. Es la mejor ilustración de que un estándar tiene "
                 "fecha de caducidad.")
@@ -138,7 +167,7 @@ nota(s, y, "// LA LECCIÓN PARA LA SESIÓN 6",
      "Entre tener el reemplazo y retirar el algoritmo viejo pasaron veintidós años. <b>Con RSA y las curvas "
      "elípticas frente a la computación cuántica el reloj ya corre</b>, y el plazo que se discute es menor.", alto=0.72)
 
-s, y = base(p, "// 08  ALGORITMO", "AES: QUÉ ES Y QUÉ NO ES", sig())
+s, y = base(p, "// 10  ALGORITMO", "AES: QUÉ ES Y QUÉ NO ES", sig())
 y = intro(s, y, "Estándar de cifrado avanzado, adoptado en 2001 tras un concurso público internacional de cinco "
                 "años. Es el ejemplo perfecto del principio de Kerckhoffs: su diseño es completamente público y "
                 "lleva veinticinco años resistiendo el análisis de toda la comunidad.")
@@ -153,7 +182,7 @@ y = tarjetas(s, y, [
         "«Cifrado con AES-256» no dice nada sobre la seguridad real si no se dice el modo y cómo se maneja la llave."]),
 ], alto=1.95)
 
-s, y = base(p, "// 09  MECANISMO", "EL PROBLEMA DE LOS DIECISÉIS BYTES", sig())
+s, y = base(p, "// 11  MECANISMO", "EL PROBLEMA DE LOS DIECISÉIS BYTES", sig())
 y = intro(s, y, "AES cifra bloques de 16 bytes. Un archivo tiene millones. Alguien tiene que decidir cómo se "
                 "encadenan esos bloques, y esa decisión —el modo de operación— importa más que el algoritmo.")
 y = bloque_codigo(s, y, [
@@ -171,7 +200,7 @@ nota(s, y, "// LA FRASE QUE HAY QUE RECORDAR",
      "El algoritmo lo elige el estándar; <b>el modo lo elige quien programa</b>. Y ahí es donde se pierde la "
      "seguridad en la práctica.", alto=0.72)
 
-s, y = base(p, "// 10  DETALLE", "QUÉ HACE AES CON ESOS DIECISÉIS BYTES", sig(), titulo_tam=24)
+s, y = base(p, "// 12  DETALLE", "QUÉ HACE AES CON ESOS DIECISÉIS BYTES", sig(), titulo_tam=24)
 y = intro(s, y, "No hace falta saber implementarlo, pero sí entender la idea, porque explica por qué es rápido y "
                 "por qué resiste. AES aplica varias rondas de cuatro operaciones que mezclan y difunden.")
 y = tabla(s, y, ["OPERACIÓN", "QUÉ HACE", "PARA QUÉ SIRVE"], [
@@ -185,7 +214,7 @@ nota(s, y, "// EL DATO QUE IMPORTA PARA LA PRÁCTICA",
      "de la llave cambia por completo la salida. <b>Diez, doce o catorce rondas según la longitud de llave.</b>",
      alto=0.82)
 
-s, y = base(p, "// 11  DECISIÓN", "128, 192 O 256: CUÁNDO IMPORTA", sig())
+s, y = base(p, "// 13  DECISIÓN", "128, 192 O 256: CUÁNDO IMPORTA", sig())
 y = intro(s, y, "Pregunta frecuente, con una respuesta menos dramática de lo que la gente espera.")
 y = tabla(s, y, ["LONGITUD", "INTENTOS PARA AGOTARLA", "CUÁNDO SE JUSTIFICA"], [
     [("AES-128", {"bold": True}), "Del orden de 3,4 × 10³⁸", "Inalcanzable con tecnología clásica. Suficiente para la mayoría de los datos"],
@@ -197,7 +226,7 @@ nota(s, y, "// LA RESPUESTA HONESTA",
      "porque 128 esté en riesgo. <b>Discutir la longitud de llave mientras la llave está incrustada en el código "
      "es el tipo de conversación que le costó $71 millones a Coopaburrá.</b>", alto=0.88)
 
-s, y = base(p, "// 12  MODO", "ECB: CADA BLOQUE POR SU CUENTA", sig())
+s, y = base(p, "// 14  MODO", "ECB: CADA BLOQUE POR SU CUENTA", sig())
 y = intro(s, y, "El modo más simple: se parte el dato en bloques y se cifra cada uno con la misma llave, de forma "
                 "independiente. Es rápido, se puede paralelizar y es la opción por defecto de muchas bibliotecas "
                 "antiguas. Tiene un defecto que se ve a simple vista.")
@@ -214,7 +243,7 @@ nota(s, y, "// LA CONSECUENCIA",
      "que todos reconocen.", alto=0.85)
 
 # ---------- la demostración ----------
-s, y = base(p, "// 13  DEMOSTRACIÓN", "EL ESCUDO DE LA INSTITUCIÓN", sig())
+s, y = base(p, "// 15  DEMOSTRACIÓN", "EL ESCUDO DE LA INSTITUCIÓN", sig())
 y = intro(s, y, "Tomamos el escudo de la IUE, lo guardamos como imagen y ciframos los píxeles con AES-256, "
                 "conservando solo la cabecera del archivo para poder abrirlo. Llave de 256 bits generada al azar. "
                 "A la izquierda el original; a la derecha, el mismo escudo cifrado en modo ECB.")
@@ -224,7 +253,7 @@ deck_lib._tx(s, 8.85, y + 0.60, 3.80, 1.40,
     "Esto está cifrado con AES-256, el mismo algoritmo que protege secretos de Estado. Y el escudo se "
     "sigue reconociendo perfectamente.", CUERPO, 12, NEGRO, bold=True, interlineado=1.32)
 
-s, y = base(p, "// 14  DEMOSTRACIÓN", "EL MISMO ESCUDO, EL MISMO ALGORITMO, OTRO MODO", sig(), titulo_tam=23)
+s, y = base(p, "// 16  DEMOSTRACIÓN", "EL MISMO ESCUDO, EL MISMO ALGORITMO, OTRO MODO", sig(), titulo_tam=23)
 y = intro(s, y, "Idéntica imagen, idéntico AES-256, idéntica longitud de llave. Lo único que cambió fue el modo de "
                 "operación: en vez de cifrar cada bloque por separado, cada bloque se encadena con el resultado "
                 "del anterior.")
@@ -234,7 +263,7 @@ deck_lib._tx(s, 8.85, y + 0.60, 3.80, 1.40,
     "La diferencia no está en el algoritmo ni en la llave. Está en una decisión de una línea de código "
     "que muchas veces se toma sin pensar.", CUERPO, 12, NEGRO, bold=True, interlineado=1.32)
 
-s, y = base(p, "// 15  EXPLICACIÓN", "POR QUÉ PASA ESO", sig())
+s, y = base(p, "// 17  EXPLICACIÓN", "POR QUÉ PASA ESO", sig())
 y = intro(s, y, "El escudo tiene grandes zonas de un solo color. Cada zona uniforme produce bloques de entrada "
                 "idénticos, y en ECB los bloques idénticos producen salidas idénticas. El contorno del escudo "
                 "queda dibujado por la frontera entre zonas.")
@@ -250,7 +279,7 @@ nota(s, y, "// DONDE ESTO IMPORTA DE VERDAD",
      "No en imágenes: casi nadie cifra imágenes con ECB. Importa en <b>bases de datos cifradas campo por campo</b>, "
      "donde permite contar cuántos registros comparten un valor y, con eso, deducir cuál es.", alto=0.80)
 
-s, y = base(p, "// 16  MODO", "CBC Y EL VECTOR DE INICIALIZACIÓN", sig())
+s, y = base(p, "// 18  MODO", "CBC Y EL VECTOR DE INICIALIZACIÓN", sig())
 y = intro(s, y, "Encadenamiento de bloques: antes de cifrar, cada bloque se combina con el texto cifrado del "
                 "bloque anterior. El primero no tiene anterior, así que se le da un valor de arranque: el vector "
                 "de inicialización.")
@@ -261,7 +290,7 @@ y = tabla(s, y, ["ASPECTO", "REGLA", "SI SE INCUMPLE"], [
     [("CBC no da integridad", {"bold": True}), "Detecta ruido, no manipulación deliberada", "Un atacante puede alterar el texto cifrado para producir cambios controlados en el claro"],
 ], [3.2, 4.2, 3.8], alto_fila=0.50)
 
-s, y = base(p, "// 17  DETALLE", "EL RELLENO Y POR QUÉ EXISTE", sig())
+s, y = base(p, "// 19  DETALLE", "EL RELLENO Y POR QUÉ EXISTE", sig())
 y = intro(s, y, "AES cifra bloques completos de 16 bytes. Si el dato no es múltiplo exacto, hay que completarlo. "
                 "Ese relleno parece un detalle administrativo y ha sido el origen de ataques muy serios.")
 y = bloque_codigo(s, y, [
@@ -281,7 +310,7 @@ y = dos_columnas(s, y,
         "Es un ataque contra el sistema, no contra AES. Los modos autenticados lo eliminan de raíz."]),
     alto=1.85)
 
-s, y = base(p, "// 18  ATAQUE", "EL ORÁCULO DE RELLENO", sig())
+s, y = base(p, "// 20  ATAQUE", "EL ORÁCULO DE RELLENO", sig())
 y = intro(s, y, "El relleno parece un detalle de formato. En 2002 Serge Vaudenay mostró que puede bastar para "
                 "descifrar un mensaje completo sin conocer la llave, y el ataque ha reaparecido en productos reales "
                 "durante veinte años.")
@@ -301,7 +330,7 @@ nota(s, y, "// POR QUÉ ESTO CONDENA A CBC SIN AUTENTICAR",
      "de mirar el relleno</b> y el oráculo desaparece. POODLE, en 2014, fue una variante sobre el canal seguro.",
      alto=0.92)
 
-s, y = base(p, "// 19  MODO", "CTR Y GCM: DE CIFRAR A CIFRAR CON GARANTÍA", sig(), titulo_tam=24)
+s, y = base(p, "// 21  MODO", "CTR Y GCM: DE CIFRAR A CIFRAR CON GARANTÍA", sig(), titulo_tam=24)
 y = intro(s, y, "CTR convierte el cifrador de bloques en un cifrador de flujo: cifra un contador y combina el "
                 "resultado con el dato. GCM hace lo mismo y además calcula una etiqueta de autenticación sobre "
                 "todo el mensaje. Esa etiqueta es la diferencia entre confidencialidad y protección.")
@@ -316,7 +345,7 @@ y = tarjetas(s, y, [
         "Es el modo que hoy se debe usar por defecto, salvo que exista una razón documentada para otro."]),
 ], alto=2.05)
 
-s, y = base(p, "// 20  DETALLE", "GCM POR DENTRO: LA ETIQUETA Y LOS DATOS ASOCIADOS", sig(), titulo_tam=22)
+s, y = base(p, "// 22  DETALLE", "GCM POR DENTRO: LA ETIQUETA Y LOS DATOS ASOCIADOS", sig(), titulo_tam=22)
 y = intro(s, y, "Vale la pena ver qué produce GCM exactamente, porque de ahí salen dos preguntas de auditoría que "
                 "casi nadie hace: qué pasa con la etiqueta y qué se autentica sin cifrar.")
 y = bloque_codigo(s, y, [
@@ -335,7 +364,7 @@ y = dos_columnas(s, y,
         "¿Se recortó la etiqueta para ahorrar espacio? Por debajo de 96 bits la protección se debilita rápido."]),
     alto=1.95)
 
-s, y = base(p, "// 21  ALTERNATIVA", "CIFRADOS DE FLUJO MODERNOS: CHACHA20-POLY1305", sig(), titulo_tam=22)
+s, y = base(p, "// 23  ALTERNATIVA", "CIFRADOS DE FLUJO MODERNOS: CHACHA20-POLY1305", sig(), titulo_tam=22)
 y = intro(s, y, "AES no es la única opción moderna. En teléfonos y equipos sin aceleración por hardware manda otra construcción.")
 y = tabla(s, y, ["CRITERIO", "AES-GCM", "CHACHA20-POLY1305"], [
     [("Tipo", {"bold": True}), "Cifrado de bloque en modo contador, con autenticación", "Cifrado de flujo con autenticador integrado"],
@@ -349,7 +378,7 @@ nota(s, y, "// PARA EL INVENTARIO",
      "es hallazgo es un cifrado de flujo sin autenticador</b>, como RC4, que el canal seguro prohibió en 2015.",
      alto=0.78)
 
-s, y = base(p, "// 22  SÍNTESIS", "CUÁL USAR Y CUÁNDO", sig())
+s, y = base(p, "// 24  SÍNTESIS", "CUÁL USAR Y CUÁNDO", sig())
 y = tabla(s, y, ["MODO", "CONFIDENCIALIDAD", "INTEGRIDAD", "CUÁNDO USARLO"], [
     [("ECB", {"bold": True, "color": NARANJA}), "Parcial: filtra estructura", ("No", {"color": NARANJA}), "Nunca. No existe un caso legítimo en un sistema nuevo"],
     [("CBC", {"bold": True}), "Sí, con vector correcto", ("No", {"color": NARANJA}), "Solo por compatibilidad con sistemas existentes, y siempre acompañado de un código de autenticación"],
@@ -365,7 +394,7 @@ nota(s, y, "// CÓMO SE AUDITA ESTO EN UNA ORGANIZACIÓN",
 seccion(p, "03", "LOS ERRORES QUE SE REPITEN",
         "Cinco formas de arruinar un cifrado correcto", sig())
 
-s, y = base(p, "// 23  ERROR 1", "REPETIR EL VECTOR O EL CONTADOR", sig())
+s, y = base(p, "// 25  ERROR 1", "REPETIR EL VECTOR O EL CONTADOR", sig())
 y = intro(s, y, "Es el mismo error del martes con otro disfraz. Si dos mensajes se cifran con la misma llave y el "
                 "mismo vector, la protección desaparece parcialmente, y en modo CTR desaparece por completo.")
 y = bloque_codigo(s, y, [
@@ -381,7 +410,7 @@ nota(s, y, "// DÓNDE APARECE EN LA VIDA REAL",
      "En sistemas que generan el vector a partir del identificador del registro, de la fecha, o de un contador que "
      "se reinicia cuando el servicio se reinicia. Los tres son predecibles y los tres se repiten.", alto=0.78)
 
-s, y = base(p, "// 24  ERROR 2", "CIFRAR SIN AUTENTICAR", sig())
+s, y = base(p, "// 26  ERROR 2", "CIFRAR SIN AUTENTICAR", sig())
 y = intro(s, y, "El segundo error más frecuente y el menos intuitivo: mucha gente supone que si un dato está "
                 "cifrado, nadie puede modificarlo de forma útil. Es falso.")
 y = dos_columnas(s, y,
@@ -394,7 +423,7 @@ y = dos_columnas(s, y,
         "La solución no es cifrar mejor: es añadir autenticación, o usar un modo que ya la traiga."]),
     alto=2.30)
 
-s, y = base(p, "// 25  DEMOSTRACIÓN", "ALTERAR UN MONTO SIN CONOCER LA LLAVE", sig())
+s, y = base(p, "// 27  DEMOSTRACIÓN", "ALTERAR UN MONTO SIN CONOCER LA LLAVE", sig())
 y = intro(s, y, "Así se ve el error 2 en un caso concreto: un registro de transferencia cifrado en modo CTR, sin "
                 "autenticación, y un atacante que conoce el formato del registro pero no la llave.")
 y = bloque_codigo(s, y, [
@@ -413,7 +442,7 @@ nota(s, y, "// LO QUE LO HABRÍA IMPEDIDO",
      "evita</b>: el ataque cambia un poco, pero existe. Por eso la respuesta es cifrado autenticado, no otro modo "
      "sin autenticar.", alto=0.80)
 
-s, y = base(p, "// 26  ERROR 3", "ECB EN PRODUCCIÓN: EL CASO ADOBE", sig())
+s, y = base(p, "// 28  ERROR 3", "ECB EN PRODUCCIÓN: EL CASO ADOBE", sig())
 y = intro(s, y, "En 2013 se filtró una base de datos con unos 150 millones de registros de usuarios. Las "
                 "contraseñas no estaban resumidas con una función de una vía: estaban <b>cifradas</b> con un "
                 "algoritmo de bloques en modo ECB y una sola llave.")
@@ -428,7 +457,7 @@ nota(s, y, "// LA LECCIÓN PARA EL CASO",
      "vemos el martes, con el hallazgo H1 de Coopaburrá.", alto=0.90)
 
 # ───────────── SECCIÓN 04 · LOS TRES ESTADOS ────────────────
-s, y = base(p, "// 27  ERROR 4", "UNA SOLA LLAVE PARA TODO", sig())
+s, y = base(p, "// 29  ERROR 4", "UNA SOLA LLAVE PARA TODO", sig())
 y = intro(s, y, "El cuarto error no es de algoritmo ni de modo: es de diseño. Usar la misma llave para propósitos "
                 "distintos convierte cualquier filtración parcial en una filtración total.")
 y = tabla(s, y, ["SÍNTOMA", "CONSECUENCIA", "DÓNDE APARECE EN EL CASO"], [
@@ -441,7 +470,7 @@ nota(s, y, "// EL PRINCIPIO",
      "Una llave, un propósito, un ámbito y un periodo. Cuando alguna de esas cuatro cosas se comparte, la "
      "pregunta sobre qué pasa si la llave se filtra deja de tener una respuesta acotada.", alto=0.72)
 
-s, y = base(p, "// 28  ERROR 5", "LA LLAVE A LA VISTA", sig())
+s, y = base(p, "// 30  ERROR 5", "LA LLAVE A LA VISTA", sig())
 y = intro(s, y, "El quinto error no es de criptografía sino de dónde termina la llave. En Coopaburrá aparece en tres lugares.")
 y = tabla(s, y, ["DÓNDE APARECE", "POR QUÉ ES GRAVE", "EN EL CASO"], [
     [("Escrita en el código fuente", {"bold": True}), "Queda en el repositorio para siempre, en cada copia", "La sal constante de H1, visible para once personas"],
@@ -455,7 +484,7 @@ nota(s, y, "// DÓNDE DEBE ESTAR",
      "se cifre o descifre, <b>sin que la llave llegue nunca a la memoria de la aplicación</b>. La llave no se "
      "guarda: se pide. Es la sesión 6.", alto=0.80)
 
-s, y = base(p, "// 29  DEFENSA", "LA MEJOR DEFENSA CONTRA LOS CINCO ERRORES", sig())
+s, y = base(p, "// 31  DEFENSA", "LA MEJOR DEFENSA CONTRA LOS CINCO ERRORES", sig())
 y = intro(s, y, "Los cinco errores tienen algo en común: son decisiones que alguien tomó mientras programaba. La "
                 "defensa más efectiva no es capacitar mejor a cada programador, sino quitarle las decisiones.")
 y = tabla(s, y, ["NIVEL DE LA LIBRERÍA", "QUÉ DECIDE QUIEN PROGRAMA", "QUÉ ERRORES QUEDAN POSIBLES"], [
@@ -471,7 +500,7 @@ nota(s, y, "// LA RECOMENDACIÓN PARA CUALQUIER EQUIPO DE DESARROLLO",
 seccion(p, "04", "LOS TRES ESTADOS DEL DATO",
         "Bloque 4 · Reposo, tránsito y uso: qué protege cada cifrado y contra quién", sig())
 
-s, y = base(p, "// 30  MARCO", "UN DATO ESTÁ SIEMPRE EN UNO DE TRES ESTADOS", sig(), titulo_tam=24)
+s, y = base(p, "// 32  MARCO", "UN DATO ESTÁ SIEMPRE EN UNO DE TRES ESTADOS", sig(), titulo_tam=24)
 y = intro(s, y, "Cada estado exige un mecanismo distinto, y proteger uno no protege los otros. Confundirlos es "
                 "exactamente el hallazgo H3 del caso.")
 y = tabla(s, y, ["ESTADO", "QUÉ SIGNIFICA", "MECANISMO", "CONTRA QUIÉN PROTEGE"], [
@@ -484,7 +513,7 @@ nota(s, y, "// EL MALENTENDIDO MÁS CARO DEL SECTOR",
      "parcialmente: <b>el disco cifrado únicamente protege mientras el servidor está apagado</b>. Encendido, el "
      "sistema descifra de forma transparente para cualquiera que consulte.", alto=0.92)
 
-s, y = base(p, "// 31  CASO", "HALLAZGO H3 A LA LUZ DE ESTO", sig())
+s, y = base(p, "// 33  CASO", "HALLAZGO H3 A LA LUZ DE ESTO", sig())
 y = intro(s, y, "Coopaburrá declaró el dato «protegido» en 2019 porque tenía cifrado de disco completo. Con lo "
                 "que ya sabemos, veamos qué protege realmente y qué no.")
 y = tabla(s, y, ["AMENAZA", "¿EL CIFRADO DE DISCO LA DETIENE?", "QUÉ HARÍA FALTA"], [
@@ -499,7 +528,7 @@ nota(s, y, "// LA PREGUNTA PARA EL INFORME",
      "trabajo? <b>Esa pregunta vale más que cualquier recomendación de algoritmo.</b>", alto=0.72)
 
 # ───────────────── SECCIÓN 05 · LABORATORIO 2 ───────────────
-s, y = base(p, "// 32  MECANISMO", "EL CIFRADO DE DISCO POR DENTRO", sig())
+s, y = base(p, "// 34  MECANISMO", "EL CIFRADO DE DISCO POR DENTRO", sig())
 y = intro(s, y, "Vale la pena ver cómo funciona para entender con precisión qué protege. La llave vive en un lugar "
                 "muy concreto mientras el servidor está encendido.")
 y = dos_columnas(s, y,
@@ -516,7 +545,7 @@ nota(s, y, "// LA FRASE PARA EL INFORME DE H3",
      "El cifrado de disco de Coopaburrá es un control contra el robo del medio físico, y funciona para eso. <b>No es "
      "un control de acceso a los datos</b>, y el informe de 2019 lo presentó como si lo fuera.", alto=0.78)
 
-s, y = base(p, "// 33  OPCIONES", "TRES FORMAS DE CIFRAR UNA BASE DE DATOS", sig(), titulo_tam=24)
+s, y = base(p, "// 35  OPCIONES", "TRES FORMAS DE CIFRAR UNA BASE DE DATOS", sig(), titulo_tam=24)
 y = intro(s, y, "La recomendación para el hallazgo H3 va a ser una de estas tres, y la diferencia entre ellas es "
                 "quién puede ver el dato en claro.")
 y = tabla(s, y, ["OPCIÓN", "CÓMO FUNCIONA", "QUIÉN VE EL DATO EN CLARO", "COSTO"], [
@@ -529,7 +558,7 @@ nota(s, y, "// LA RESTRICCIÓN DEL CASO",
      "y requiere su aprobación</b>. Eso encarece las dos últimas opciones y hay que decirlo en la recomendación.",
      alto=0.82)
 
-s, y = base(p, "// 34  PATRÓN", "CIFRADO EN SOBRE: UNA LLAVE PARA EL DATO, OTRA PARA LA LLAVE", sig(), titulo_tam=20)
+s, y = base(p, "// 36  PATRÓN", "CIFRADO EN SOBRE: UNA LLAVE PARA EL DATO, OTRA PARA LA LLAVE", sig(), titulo_tam=20)
 y = intro(s, y, "El patrón que usa toda la industria para cifrar grandes volúmenes, y el que resuelve a la vez la "
                 "rotación y la custodia. Aparece en cada servicio de llaves y en cada módulo de hardware.")
 y = bloque_codigo(s, y, [
@@ -547,7 +576,7 @@ nota(s, y, "// POR QUÉ RESUELVE LO QUE PARECÍA IMPOSIBLE",
      "dato porque están cifradas. <b>Es la respuesta al problema de rotación de la diapositiva siguiente</b> y la "
      "base de la jerarquía de llaves de la sesión 6.", alto=0.85)
 
-s, y = base(p, "// 35  CONSULTA", "CÓMO SE BUSCA SOBRE UN DATO CIFRADO", sig())
+s, y = base(p, "// 37  CONSULTA", "CÓMO SE BUSCA SOBRE UN DATO CIFRADO", sig())
 y = intro(s, y, "El problema práctico que tumba más proyectos de cifrado de campo. Si cada cifrado de la misma "
                 "cédula es distinto, ¿cómo se encuentra a un asociado por su cédula?")
 y = tabla(s, y, ["TÉCNICA", "CÓMO PERMITE BUSCAR", "QUÉ REVELA"], [
@@ -561,7 +590,7 @@ nota(s, y, "// LA DECISIÓN PARA EL HALLAZGO H3",
      "forma más rápida de que el proyecto se cancele por rendimiento.</b> La entrega 2 tiene que decir qué técnica "
      "y por qué.", alto=0.80)
 
-s, y = base(p, "// 36  FRONTERA", "DATOS EN USO: EL ESTADO MÁS DIFÍCIL", sig())
+s, y = base(p, "// 38  FRONTERA", "DATOS EN USO: EL ESTADO MÁS DIFÍCIL", sig())
 y = intro(s, y, "Para procesar un dato hay que descifrarlo, y en ese instante está en claro en la memoria. Dos "
                 "tecnologías atacan ese problema, y conviene conocerlas para evaluar lo que prometen los proveedores.")
 y = dos_columnas(s, y,
@@ -579,7 +608,7 @@ nota(s, y, "// LO QUE SIGNIFICA PARA EL CASO",
      "<b>Pero si un proveedor ofrece «cifrado en todo momento», ya saben qué preguntar</b>: con qué tecnología, y "
      "qué pasa con el dato mientras se procesa.", alto=0.85)
 
-s, y = base(p, "// 37  RIESGO", "EL OTRO LADO: PERDER LA LLAVE", sig())
+s, y = base(p, "// 39  RIESGO", "EL OTRO LADO: PERDER LA LLAVE", sig())
 y = intro(s, y, "Cifrar bien introduce un riesgo nuevo que casi nadie evalúa. Si la llave se pierde, el dato se "
                 "pierde, y eso es un problema de disponibilidad, que ustedes ya trabajaron en continuidad.")
 y = tarjetas(s, y, [
@@ -597,7 +626,7 @@ nota(s, y, "// LA IRONÍA DEL HALLAZGO H4",
      "procedimiento de custodia produce el riesgo contrario: perderla y quedarse sin respaldos. <b>La respuesta "
      "correcta no es esconder la llave: es administrarla.</b>", alto=0.82)
 
-s, y = base(p, "// 38  DISEÑO", "UN RESPALDO CIFRADO BIEN HECHO", sig())
+s, y = base(p, "// 40  DISEÑO", "UN RESPALDO CIFRADO BIEN HECHO", sig())
 y = intro(s, y, "Con todo lo de hoy ya se puede describir cómo debería ser el respaldo de Coopaburrá. Es, en la "
                 "práctica, el esqueleto de la recomendación para H4 en la entrega 2.")
 y = pasos(s, y + 0.05, [
@@ -613,7 +642,7 @@ y = pasos(s, y + 0.05, [
      "Un respaldo que nunca se ha restaurado no es un respaldo: es una esperanza."),
 ], alto=0.76)
 
-s, y = base(p, "// 39  OPERACIÓN", "QUÉ SIGNIFICA ROTAR UNA LLAVE", sig())
+s, y = base(p, "// 41  OPERACIÓN", "QUÉ SIGNIFICA ROTAR UNA LLAVE", sig())
 y = intro(s, y, "Rotar suena trivial hasta que se calcula. Es una de las decisiones donde el costo operativo "
                 "determina el diseño, y por eso conviene pensarlo antes de cifrar, no después.")
 y = tabla(s, y, ["PREGUNTA", "EN COOPABURRÁ", "IMPLICACIÓN"], [
@@ -626,7 +655,7 @@ y = tabla(s, y, ["PREGUNTA", "EN COOPABURRÁ", "IMPLICACIÓN"], [
 seccion(p, "05", "LABORATORIO 2",
         "Cincuenta y cinco minutos · Modos, la línea de respaldo de Coopaburrá y Python", sig())
 
-s, y = base(p, "// 40  CLAVE PARA EL LABORATORIO", "QUÉ HACE REALMENTE LA OPCIÓN -k", sig(), titulo_tam=23)
+s, y = base(p, "// 42  CLAVE PARA EL LABORATORIO", "QUÉ HACE REALMENTE LA OPCIÓN -k", sig(), titulo_tam=23)
 y = intro(s, y, "Necesario para el ejercicio 3. Las herramientas ofrecen dos formas de darles una llave, y no son "
                 "lo mismo aunque se parezcan en la línea de comandos.")
 y = tabla(s, y, ["OPCIÓN", "QUÉ RECIBE", "QUÉ HACE CON ESO"], [
@@ -642,7 +671,7 @@ y = dos_columnas(s, y,
         "La llave no solo está en un archivo: también se asoma cada noche entre las 11:40 y las 2:15."]),
     alto=1.75)
 
-s, y = base(p, "// 41  LABORATORIO", "LOS TRES EJERCICIOS", sig())
+s, y = base(p, "// 43  LABORATORIO", "LOS TRES EJERCICIOS", sig())
 y = pasos(s, y + 0.05, [
     ("Ejercicio 1 · Reproducir el escudo",
      "Tomen una imagen con zonas de color uniforme, cífrenla en ECB y en CBC conservando la cabecera, y comparen. Entreguen las dos imágenes y la explicación de la diferencia."),
@@ -655,7 +684,7 @@ nota(s, y, "// LO QUE SE ENTREGA Y CÓMO SE CALIFICA",
      "Una página por equipo al final del bloque. Se evalúa el análisis, no el resultado: un ejercicio que funcionó "
      "sin explicación del porqué vale la mitad que uno que falló con un diagnóstico correcto.", alto=0.80)
 
-s, y = base(p, "// 42  LABORATORIO", "COMANDOS DE ARRANQUE", sig())
+s, y = base(p, "// 44  LABORATORIO", "COMANDOS DE ARRANQUE", sig())
 y = intro(s, y, "Suficiente para empezar. Lo demás está en la guía de laboratorio que se les entrega.")
 y = bloque_codigo(s, y, [
     "# Ejercicio 1 — conservar la cabecera del archivo y cifrar solo los píxeles",
@@ -671,7 +700,7 @@ y = bloque_codigo(s, y, [
     "openssl rand -hex 16     # vector de inicialización",
 ], titulo="LABORATORIO 2 · PUNTO DE PARTIDA")
 
-s, y = base(p, "// 43  PYTHON", "LABORATORIO 2 · EL EJERCICIO EN PYTHON", sig())
+s, y = base(p, "// 45  PYTHON", "LABORATORIO 2 · EL EJERCICIO EN PYTHON", sig())
 y = intro(s, y, "El ejercicio 2 hecho con la librería cryptography, que es la de referencia en Python: cifrado "
                 "autenticado, alteración de un byte y verificación de la etiqueta.")
 y = bloque_codigo(s, y, [
@@ -691,7 +720,7 @@ nota(s, y, "// LO QUE VA EN EL INFORME",
      "<b>La diferencia entre las dos salidas es la diferencia entre cifrar y proteger.</b> Y respondan: ¿qué "
      "pasaría si el nonce se repitiera en dos registros?", alto=0.90)
 
-s, y = base(p, "// 44  CASO", "LA LÍNEA QUE VAN A AUDITAR", sig())
+s, y = base(p, "// 46  CASO", "LA LÍNEA QUE VAN A AUDITAR", sig())
 y = intro(s, y, "Evidencia C del expediente. Es la línea real del programador de tareas de Coopaburrá, la que "
                 "produce el respaldo diario que viaja a Sabaneta los viernes.")
 y = bloque_codigo(s, y, [
@@ -709,7 +738,7 @@ nota(s, y, "// PISTA 3 · LO QUE NO ESTÁ",
      "en la bodega, ¿la cooperativa se daría cuenta al restaurarlo?", alto=0.75)
 
 # ──────────────────── CIERRE ────────────────────
-s, y = base(p, "// 45  HERRAMIENTA", "LISTA PARA AUDITAR CUALQUIER CIFRADO SIMÉTRICO", sig(), titulo_tam=22)
+s, y = base(p, "// 47  HERRAMIENTA", "LISTA PARA AUDITAR CUALQUIER CIFRADO SIMÉTRICO", sig(), titulo_tam=22)
 y = intro(s, y, "Consérvenla. Sirve para el informe de Coopaburrá y para el resto de su vida profesional: son las "
                 "preguntas que hay que hacer frente a cualquier sistema que diga estar cifrado.")
 pasos(s, y, [
@@ -721,7 +750,7 @@ pasos(s, y, [
     ("Cada cuánto se rota y qué pasa si se pierde", "Si no hay respuesta, hay dos hallazgos más."),
 ], alto=0.73)
 
-s, y = base(p, "// 46  SÍNTESIS", "LO QUE LLEVAMOS DE LA SESIÓN", sig())
+s, y = base(p, "// 48  SÍNTESIS", "LO QUE LLEVAMOS DE LA SESIÓN", sig())
 pasos(s, y + 0.05, [
     ("El modo de operación importa más que el algoritmo",
      "AES-256 en ECB deja ver el escudo. El mismo AES-256 en CBC no deja ver nada."),
@@ -735,7 +764,7 @@ pasos(s, y + 0.05, [
      "Qué algoritmo, qué modo, de dónde sale el vector. Con eso se sabe si el dato está protegido o solo lo parece."),
 ])
 
-s, y = base(p, "// 47  ENTREGA", "SEGUNDA PARTE DEL PRODUCTO", sig())
+s, y = base(p, "// 49  ENTREGA", "SEGUNDA PARTE DEL PRODUCTO", sig())
 y = intro(s, y, "Se entrega al inicio de la sesión 3: análisis de la protección de datos en reposo y en respaldos, "
                 "hallazgos H3 y H4.")
 y = tabla(s, y, ["SECCIÓN DEL ENTREGABLE", "QUÉ DEBE CONTENER"], [
@@ -745,7 +774,7 @@ y = tabla(s, y, ["SECCIÓN DEL ENTREGABLE", "QUÉ DEBE CONTENER"], [
     [("Qué cuesta y qué implica", {"bold": True}), "El contrato del core no permite cambiar el esquema sin cotización. Eso condiciona la recomendación y hay que decirlo"],
 ], [3.8, 6.2], alto_fila=0.54)
 
-trabajo_independiente(p, "// 48  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SESIÓN 3"], [
+trabajo_independiente(p, "// 50  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SESIÓN 3"], [
     ("12 h", "TOTAL ENTRE", "JUEVES Y MARTES", False),
     ("4 h", "LECTURA", "PREVIA", False),
     ("8 h", "ENTREGA 2 E INFORME", "DEL LABORATORIO 2", True),
@@ -758,7 +787,7 @@ trabajo_independiente(p, "// 48  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SE
    "MD5 y SHA-1 murieron. Las 8 horas de elaboración son la entrega 2 (6 h, en equipo) y el informe del laboratorio "
    "(2 h).", sig(), titulo_lecturas="Lectura previa · 4 horas")
 
-s, y = base(p, "// 49  ADELANTO", "LO QUE VIENE EL MARTES", sig())
+s, y = base(p, "// 51  ADELANTO", "LO QUE VIENE EL MARTES", sig())
 y = intro(s, y, "Sesión 3: funciones resumen, autenticación de mensajes y contraseñas. Es la sesión que resuelve "
                 "los dos hallazgos que hicieron posible el fraude.")
 tarjetas(s, y, [
@@ -772,7 +801,7 @@ tarjetas(s, y, [
         "Primera evaluación de conocimiento del módulo."]),
 ], alto=2.05)
 
-glosario(p, "// 50  GLOSARIO", 1, 2, [
+glosario(p, "// 52  GLOSARIO", 1, 2, [
     ("AES", "Advanced Encryption Standard — Estándar de cifrado avanzado. Cifrado de bloque de 128 bits, adoptado por el NIST en 2001."),
     ("DES", "Data Encryption Standard — Estándar de cifrado de datos de 1977, con llave de 56 bits. Su versión triple se retiró en 2023."),
     ("ECB / CBC / CFB / OFB / CTR", "Electronic Codebook, Cipher Block Chaining, Cipher Feedback, Output Feedback, Counter — Modos de NIST SP 800-38A."),
@@ -785,7 +814,7 @@ glosario(p, "// 50  GLOSARIO", 1, 2, [
     ("IETF / RFC", "Internet Engineering Task Force / Request for Comments — El organismo de estándares de internet y su serie de documentos."),
 ], sig())
 
-glosario(p, "// 51  GLOSARIO", 2, 2, [
+glosario(p, "// 53  GLOSARIO", 2, 2, [
     ("IUE", "Institución Universitaria de Envigado. Su escudo es la imagen de la demostración de ECB."),
     ("MB / TB", "Megabyte / Terabyte — Un millón y un billón de bytes. El core de Coopaburrá ocupa 2,3 TB."),
     ("MD5 / SHA-1", "Message Digest 5 / Secure Hash Algorithm 1 — Funciones resumen rotas por colisiones. Sesión 3."),
@@ -798,7 +827,7 @@ glosario(p, "// 51  GLOSARIO", 2, 2, [
     ("XTS", "XEX-based Tweaked-codebook mode with ciphertext Stealing — Modo de AES para discos. Cifra por sector y no autentica."),
 ], sig())
 
-fuentes(p, "// 52  FUENTES", "REFERENCIAS DE LA SESIÓN", [
+fuentes(p, "// 54  FUENTES", "REFERENCIAS DE LA SESIÓN", [
     ("NIST. (2023).", "FIPS 197-upd1: Advanced Encryption Standard (AES).", "Estructura del algoritmo, rondas y tamaños de llave"),
     ("NIST. (2001).", "SP 800-38A: Recommendation for block cipher modes of operation: Methods and techniques.", "Modos ECB, CBC, CFB, OFB y CTR"),
     ("NIST. (2007).", "SP 800-38D: Recommendation for block cipher modes of operation: Galois/Counter Mode (GCM) and GMAC.", "Secciones 5 y 8 · lectura previa de la sesión 3"),
