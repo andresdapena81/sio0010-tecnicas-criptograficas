@@ -814,7 +814,8 @@ nota(s, y, "// LO QUE SE ENTREGA",
 
 s, y = base(p, "// 51  LABORATORIO", "ENTORNO DE TRABAJO", sig())
 y = intro(s, y, "Todo el laboratorio funciona sin conexión a internet y sin permisos de administrador: Python se "
-                "instala para el usuario, y la librería también.")
+                "instala para el usuario, y la librería también. Desde la sesión 2, los ejercicios con OpenSSL van "
+                "en Git Bash en Windows —no en cmd ni PowerShell—; en macOS y Linux, en la Terminal.")
 y = tarjetas(s, y, [
     ("// HERRAMIENTA PRINCIPAL", [
         "Una página de utilidades criptográficas que se ejecuta dentro del navegador, sin enviar nada a ningún servidor.",

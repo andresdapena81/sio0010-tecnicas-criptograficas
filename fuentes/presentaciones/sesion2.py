@@ -685,7 +685,8 @@ nota(s, y, "// LO QUE SE ENTREGA Y CÓMO SE CALIFICA",
      "sin explicación del porqué vale la mitad que uno que falló con un diagnóstico correcto.", alto=0.80)
 
 s, y = base(p, "// 44  LABORATORIO", "COMANDOS DE ARRANQUE", sig())
-y = intro(s, y, "Suficiente para empezar. Lo demás está en la guía de laboratorio que se les entrega.")
+y = intro(s, y, "Suficiente para empezar. En Windows van en Git Bash —no en cmd ni PowerShell—, que trae OpenSSL "
+                "y las órdenes head, tail y cat. Lo demás está en la guía de laboratorio.")
 y = bloque_codigo(s, y, [
     "# Ejercicio 1 — separar la cabecera y cifrar solo los píxeles (BMP de muestra: escudo-plano.bmp)",
     "head -c 54 escudo-plano.bmp > cab.bin        # la cabecera del BMP son 54 bytes",
