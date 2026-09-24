@@ -687,9 +687,13 @@ nota(s, y, "// LO QUE SE ENTREGA Y CÓMO SE CALIFICA",
 s, y = base(p, "// 44  LABORATORIO", "COMANDOS DE ARRANQUE", sig())
 y = intro(s, y, "Suficiente para empezar. Lo demás está en la guía de laboratorio que se les entrega.")
 y = bloque_codigo(s, y, [
-    "# Ejercicio 1 — conservar la cabecera del archivo y cifrar solo los píxeles",
-    "openssl enc -aes-256-ecb -in imagen.bmp -out ecb.bin -K <llave_hex> -nopad",
-    "openssl enc -aes-256-cbc -in imagen.bmp -out cbc.bin -K <llave_hex> -iv <vi_hex> -nopad",
+    "# Ejercicio 1 — separar la cabecera y cifrar solo los píxeles (BMP de muestra: escudo-plano.bmp)",
+    "head -c 54 escudo-plano.bmp > cab.bin        # la cabecera del BMP son 54 bytes",
+    "tail -c +55 escudo-plano.bmp > pix.bin       # el resto son los píxeles",
+    "openssl enc -aes-256-ecb -in pix.bin -out ecb.bin -K <llave_hex> -nopad",
+    "openssl enc -aes-256-cbc -in pix.bin -out cbc.bin -K <llave_hex> -iv <vi_hex> -nopad",
+    "cat cab.bin ecb.bin > escudo-ecb.bmp         # unir cabecera + píxeles para poder abrirlo",
+    "cat cab.bin cbc.bin > escudo-cbc.bmp",
     "",
     "# Ejercicio 2 — cifrado autenticado frente a cifrado a secas",
     "openssl enc -aes-256-ctr -in datos.txt -out datos.ctr -K <llave_hex> -iv <vi_hex>",

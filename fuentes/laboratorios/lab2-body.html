@@ -53,7 +53,7 @@
   <p class="lead">Tomen una imagen con zonas de color uniforme, cífrenla en ECB y en CBC conservando la cabecera del archivo, y comparen. Entreguen las dos imágenes y la explicación de la diferencia.</p>
 
   <ol class="pasos">
-    <li><span><b>Consigan una imagen plana.</b> Un BMP de 24 bits con pocos colores y zonas grandes de un solo tono. Si la imagen tiene degradados o fotografía, el efecto no aparece: ECB solo delata lo que se repite, y un degradado no se repite.</span></li>
+    <li><span><b>Usen el BMP de muestra <b>escudo-plano.bmp</b>, que viene con el laboratorio</b> — 24 bits, colores planos y 128 px de ancho, para que los píxeles queden en un múltiplo de 16 bytes y <code>-nopad</code> no dé error. Si prefieren traer la suya, que sea un BMP de 24 bits con pocos colores y zonas grandes de un solo tono: con degradados o fotografía el efecto no aparece, porque ECB solo delata lo que se repite.</span></li>
     <li><span><b>Separen la cabecera de los píxeles.</b> En un BMP la cabecera ocupa los primeros 54 bytes. Si la cifran también, el archivo deja de abrirse.</span></li>
     <li><span><b>Cifren solo los píxeles</b>, en ECB y en CBC, con la misma llave y sin relleno.</span></li>
     <li><span><b>Vuelvan a pegar la cabecera</b> delante de cada resultado y abran los dos archivos.</span></li>
@@ -65,8 +65,8 @@ openssl rand -hex 32 &gt; llave.hex
 openssl rand -hex 16 &gt; vi.hex
 
 <span class="c"># separar cabecera (54 bytes) y píxeles</span>
-head -c 54 escudo.bmp &gt; cabecera.bin
-tail -c +55 escudo.bmp &gt; pixeles.bin
+head -c 54 escudo-plano.bmp &gt; cabecera.bin
+tail -c +55 escudo-plano.bmp &gt; pixeles.bin
 
 <span class="c"># cifrar SOLO los píxeles, sin relleno, con -K mayúscula</span>
 openssl enc -aes-256-ecb -in pixeles.bin -out ecb.bin -K $(cat llave.hex) -nopad
@@ -82,7 +82,7 @@ cat cabecera.bin cbc.bin &gt; escudo-cbc.bmp</pre></div>
 <span class="n">from</span> PIL <span class="n">import</span> Image
 <span class="n">from</span> cryptography.hazmat.primitives.ciphers <span class="n">import</span> Cipher, algorithms, modes
 
-img = Image.open(<span class="n">"escudo.png"</span>).convert(<span class="n">"RGB"</span>)
+img = Image.open(<span class="n">"escudo-plano.bmp"</span>).convert(<span class="n">"RGB"</span>)
 img = img.quantize(colors=2).convert(<span class="n">"RGB"</span>)     <span class="c"># aplanar: sin esto no se ve nada</span>
 crudo = img.tobytes()
 <span class="n">assert</span> (img.width * 3) % 16 == 0                <span class="c"># la fila debe cuadrar con el bloque</span>

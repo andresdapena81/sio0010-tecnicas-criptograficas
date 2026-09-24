@@ -31,6 +31,12 @@ assert (LADO * 3) % 16 == 0, "el ancho en bytes debe ser múltiplo del bloque de
 crudo = base.tobytes()
 llave, vector = os.urandom(32), os.urandom(16)
 
+# BMP de muestra que se entrega con el laboratorio 2, para el ejercicio 1 con OpenSSL.
+# 24 bits, colores planos y ancho múltiplo de 16 → los píxeles son múltiplo de 16 bytes y -nopad no falla.
+_bmp = os.path.join(AQUI, "escudo-plano.bmp")
+base.save(_bmp, "BMP")
+print("  %-22s %6d bytes" % ("escudo-plano.bmp", os.path.getsize(_bmp)))
+
 
 def cifra(modo):
     c = Cipher(algorithms.AES(llave), modo).encryptor()
