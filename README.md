@@ -34,7 +34,7 @@ Para descargar un laboratorio: entren al archivo en la carpeta [`laboratorios/`]
 
 - **[`laboratorios/`](laboratorios/)** — los seis laboratorios, en HTML. Es lo que usa el estudiante.
 - **[`caso/`](caso/)** — el caso de estudio Coopaburrá y su anexo técnico, en PDF. El caso se lee antes de la sesión 1; el anexo trae la evidencia técnica por sistema que alimenta el inventario.
-- **[`guias/`](guias/)** — la guía de la primera entrega del informe: cómo construir el inventario criptográfico.
+- **[`guias/`](guias/)** — las guías de las entregas del informe: cómo construir el inventario criptográfico (entrega 1) y cómo analizar la protección de datos en reposo y en respaldos (entrega 2).
 - **[`presentaciones/`](presentaciones/)** — los seis decks de las sesiones, en PowerPoint y en PDF.
 - **[`fuentes/`](fuentes/)** — los generadores del material, para quien quiera reconstruirlo o adaptarlo. Ver [`fuentes/README.md`](fuentes/README.md).
 
