@@ -35,7 +35,7 @@ Para descargar un laboratorio: entren al archivo en la carpeta [`laboratorios/`]
 - **[`laboratorios/`](laboratorios/)** — los seis laboratorios, en HTML. Es lo que usa el estudiante.
 - **[`demos/`](demos/)** — demostraciones interactivas para proyectar en clase. Incluye **AES paso a paso**, que cifra un bloque de 16 bytes mostrando cada operación (sustitución, transposición, mezcla y suma de la llave) ronda por ronda.
 - **[`caso/`](caso/)** — el caso de estudio Coopaburrá y su anexo técnico, en PDF. El caso se lee antes de la sesión 1; el anexo trae la evidencia técnica por sistema que alimenta el inventario.
-- **[`guias/`](guias/)** — las guías de las entregas del informe: cómo construir el inventario criptográfico (entrega 1) y cómo analizar la protección de datos en reposo y en respaldos (entrega 2).
+- **[`guias/`](guias/)** — las guías de las entregas del informe: el inventario criptográfico (entrega 1), la protección de datos en reposo y en respaldos (entrega 2) y el rediseño de contraseñas y el diagnóstico de la firma (entrega 3).
 - **[`presentaciones/`](presentaciones/)** — los seis decks de las sesiones, en PowerPoint y en PDF.
 - **[`fuentes/`](fuentes/)** — los generadores del material, para quien quiera reconstruirlo o adaptarlo. Ver [`fuentes/README.md`](fuentes/README.md).
 

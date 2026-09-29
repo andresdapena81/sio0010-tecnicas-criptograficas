@@ -456,7 +456,37 @@ nota(s, y, "// POR QUÉ LA SAL DE COOPABURRÁ NO SIRVE",
      "precalculadas genéricas, y ni siquiera eso, porque basta calcular una tabla nueva con esa constante. No "
      "protege contra el ataque que de verdad importa: romper las 142.000 cuentas en una sola pasada.", alto=0.92)
 
-s, y = base(p, "// 28  ATAQUE", "EL TALLER DEL ATACANTE: CUÁNTO CUESTA CADA INTENTO", sig(), titulo_tam=22)
+s, y = base(p, "// 28  EJEMPLO", "LA SAL, CON NÚMEROS: LA MISMA CONTRASEÑA, DOS RESULTADOS", sig(), titulo_tam=20)
+y = intro(s, y, "Dos asociados del caso, usuario_a y usuario_c, eligieron la misma contraseña. Lo que la base guarda "
+                "de cada uno depende de si hay sal, y de qué clase.")
+y = bloque_codigo(s, y, [
+    "# CON sal única por usuario — la misma contraseña, resúmenes distintos",
+    'usuario_a · "password" + sal 8f2a…c1  →  argon2id  →  e7b3a9d0…',
+    'usuario_c · "password" + sal a17d…04  →  argon2id  →  f4c09122…   ← distinto: no se nota que repiten',
+    "",
+    "# SIN sal, como el portal hoy (evidencia B) — la misma contraseña, el MISMO resumen",
+    'usuario_a · "password"  →  sha1  →  5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8',
+    'usuario_c · "password"  →  sha1  →  5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8   ← idéntico',
+], titulo="EVIDENCIA B · DOS USUARIOS QUE COMPARTEN RESUMEN")
+nota(s, y, "// LO QUE LA SAL SÍ HACE, Y LO QUE NO",
+     "La sal no esconde la contraseña —de eso se encarga la función lenta—. La sal esconde <b>que dos personas usan "
+     "la misma</b>, y obliga al atacante a trabajar cuenta por cuenta en vez de romper toda la base en una sola "
+     "pasada. En Coopaburrá, como la sal ni siquiera se aplica, ese resumen es el valor público de «password».", alto=0.92)
+
+s, y = base(p, "// 29  USO", "CÓMO SE USA LA SAL, Y CÓMO SE USA MAL", sig())
+y = intro(s, y, "La sal es fácil de usar bien y fácil de arruinar. Solo el primer patrón funciona.")
+y = tabla(s, y, ["CÓMO SE USA", "¿SIRVE?", "POR QUÉ"], [
+    ["Aleatoria y única por usuario, junto al resumen", ("Sí", {"bold": True}), "Lo correcto: cada cuenta se ataca por separado y el costo se multiplica por 142.000"],
+    ["Constante para toda la base", ("No", {"bold": True, "color": NARANJA}), "Un sufijo, no una sal: una tabla con esa constante rompe todo. Es Coopaburrá"],
+    ["Derivada del usuario, como la cédula", ("No", {"bold": True, "color": NARANJA}), "Es predecible: el atacante la conoce y precalcula igual que sin sal"],
+    ["Demasiado corta, de pocos bits", ("Débil", {"bold": True, "color": NARANJA}), "Se precalculan tablas para todas las sales posibles. Usen 16 bytes"],
+    ["Reutilizada entre usuarios", ("No", {"bold": True, "color": NARANJA}), "Dos con la misma sal y contraseña vuelven a colisionar"],
+], [4.7, 1.3, 5.0], alto_fila=0.46)
+nota(s, y, "// LA REGLA DE ORO",
+     "Una sal por registro, aleatoria, de al menos 16 bytes y guardada junto al resumen. <b>Si dos registros "
+     "comparten sal, ya falló.</b>", alto=0.62)
+
+s, y = base(p, "// 30  ATAQUE", "EL TALLER DEL ATACANTE: CUÁNTO CUESTA CADA INTENTO", sig(), titulo_tam=22)
 y = intro(s, y, "Cifras aproximadas de pruebas públicas con una sola tarjeta gráfica de gama alta. No importa el "
                 "número exacto: importa la diferencia de orden de magnitud entre las filas.")
 y = tabla(s, y, ["FUNCIÓN", "INTENTOS POR SEGUNDO", "TODAS LAS DE OCHO MINÚSCULAS · 2,1 × 10¹¹"], [
@@ -472,7 +502,7 @@ nota(s, y, "// LO QUE CAMBIA DE VERDAD",
      "primera recomendación de H1, antes que cualquier regla nueva. Las funciones que exigen memoria son todavía "
      "peores para el atacante.", alto=0.92)
 
-s, y = base(p, "// 29  SOLUCIÓN", "FUNCIONES DE DERIVACIÓN DE LLAVE", sig())
+s, y = base(p, "// 31  SOLUCIÓN", "FUNCIONES DE DERIVACIÓN DE LLAVE", sig())
 y = intro(s, y, "La solución real no es resumir mejor: es resumir <b>lento a propósito</b>. Una función de "
                 "derivación repite la operación miles de veces y consume memoria deliberadamente, para que cada "
                 "intento le cueste al atacante.")
@@ -487,7 +517,7 @@ nota(s, y, "// POR QUÉ IMPORTA LA MEMORIA Y NO SOLO EL TIEMPO",
      "memoria por intento anula esa ventaja y deja al atacante sin su mejor herramienta. Por eso las funciones "
      "modernas piden memoria, no solo repeticiones.", alto=0.88)
 
-s, y = base(p, "// 30  PARÁMETROS", "ARGON2ID: LOS PARÁMETROS Y CÓMO SE GUARDAN", sig(), titulo_tam=24)
+s, y = base(p, "// 32  PARÁMETROS", "ARGON2ID: LOS PARÁMETROS Y CÓMO SE GUARDAN", sig(), titulo_tam=24)
 y = intro(s, y, "La recomendación actual para sistemas nuevos, con los valores de referencia de las dos fuentes que "
                 "se citan en cualquier auditoría: el RFC que la estandariza y la guía de OWASP.")
 y = tabla(s, y, ["PARÁMETRO", "QUÉ CONTROLA", "VALOR DE REFERENCIA"], [
@@ -502,7 +532,7 @@ nota(s, y, "// POR QUÉ LOS PARÁMETROS SE GUARDAN CON EL RESULTADO",
      "parámetros el año próximo sin romper los registros viejos</b>: cada uno se verifica con los suyos y se "
      "actualiza en el siguiente ingreso del usuario.", alto=0.88)
 
-s, y = base(p, "// 31  CALIBRACIÓN", "CÓMO SE ELIGE EL FACTOR DE TRABAJO", sig())
+s, y = base(p, "// 33  CALIBRACIÓN", "CÓMO SE ELIGE EL FACTOR DE TRABAJO", sig())
 y = intro(s, y, "No hay un número universal: depende del servidor y de cuánta espera tolera el usuario. La regla "
                 "de calibración es sencilla y se puede defender ante un comité.")
 y = pasos(s, y, [
@@ -512,7 +542,7 @@ y = pasos(s, y, [
     ("Documente el parámetro y revíselo cada año", "El hardware del atacante mejora. Un factor calibrado en 2026 será insuficiente en 2030."),
 ])
 
-s, y = base(p, "// 32  CAPA", "LA PIMIENTA: UN SECRETO QUE NO VIVE EN LA BASE", sig(), titulo_tam=23)
+s, y = base(p, "// 34  CAPA", "LA PIMIENTA: UN SECRETO QUE NO VIVE EN LA BASE", sig(), titulo_tam=23)
 y = intro(s, y, "La sal no es secreta y viaja con el resumen. La pimienta es lo contrario: un secreto de la "
                 "aplicación, común a todos los registros, que nunca se guarda en la base de datos.")
 y = dos_columnas(s, y,
@@ -530,7 +560,7 @@ nota(s, y, "// LA IRONÍA DEL CASO",
      "<b>El problema es que vive en el código fuente, a la vista de once personas</b>, que es exactamente donde una "
      "pimienta no puede estar.", alto=0.85)
 
-s, y = base(p, "// 33  POLÍTICA", "LO QUE CAMBIÓ EN LAS POLÍTICAS DE CONTRASEÑA", sig(), titulo_tam=23)
+s, y = base(p, "// 35  POLÍTICA", "LO QUE CAMBIÓ EN LAS POLÍTICAS DE CONTRASEÑA", sig(), titulo_tam=23)
 y = intro(s, y, "Las reglas que casi todas las organizaciones siguen fueron desaconsejadas por la propia entidad "
                 "que las había recomendado. Coopaburrá exige seis caracteres y no obliga a cambiarlas: está mal "
                 "en un extremo, pero la corrección no es irse al otro.")
@@ -541,7 +571,7 @@ y = tabla(s, y, ["PRÁCTICA TRADICIONAL", "RECOMENDACIÓN ACTUAL", "POR QUÉ CAM
     [("Sin verificación externa", {"bold": True, "color": NARANJA}), "Contrastar contra listas de contraseñas ya filtradas", "Es la medida con mejor relación entre costo y efecto, y Coopaburrá no la tiene"],
 ], [3.2, 3.4, 4.4], alto_fila=0.56)
 
-s, y = base(p, "// 34  TÉCNICA", "CONSULTAR CONTRASEÑAS FILTRADAS SIN REVELARLAS", sig(), titulo_tam=24)
+s, y = base(p, "// 36  TÉCNICA", "CONSULTAR CONTRASEÑAS FILTRADAS SIN REVELARLAS", sig(), titulo_tam=24)
 y = intro(s, y, "La medida más rentable de la tabla anterior tiene un problema aparente: para saber si una contraseña "
                 "está filtrada habría que enviarla a un tercero. Una idea elegante con funciones resumen lo resuelve.")
 y = bloque_codigo(s, y, [
@@ -558,7 +588,7 @@ nota(s, y, "// EL DETALLE QUE CONVIENE NOTAR",
      "guardar contraseñas es correcta para buscarlas</b>, y distinguir los dos usos es el criterio que se evalúa.",
      alto=0.80)
 
-s, y = base(p, "// 35  DIAGNÓSTICO", "SEIS COSAS QUE UN SISTEMA DE CONTRASEÑAS NUNCA DEBE HACER", sig(), titulo_tam=20)
+s, y = base(p, "// 37  DIAGNÓSTICO", "SEIS COSAS QUE UN SISTEMA DE CONTRASEÑAS NUNCA DEBE HACER", sig(), titulo_tam=20)
 y = intro(s, y, "Errores que se detectan desde afuera, sin acceso al código, y que casi siempre anuncian problemas "
                 "más graves adentro.")
 y = tabla(s, y, ["PRÁCTICA", "QUÉ REVELA O QUÉ PROVOCA"], [
@@ -570,7 +600,7 @@ y = tabla(s, y, ["PRÁCTICA", "QUÉ REVELA O QUÉ PROVOCA"], [
     [("Recortar la contraseña sin avisar", {"bold": True}), "Solo cuentan los primeros caracteres. bcrypt, por ejemplo, ignora lo que pase de 72 bytes"],
 ], [4.4, 5.6], alto_fila=0.44)
 
-s, y = base(p, "// 36  DISEÑO", "QUÉ SE GUARDA POR CADA USUARIO", sig())
+s, y = base(p, "// 38  DISEÑO", "QUÉ SE GUARDA POR CADA USUARIO", sig())
 y = intro(s, y, "El rediseño del hallazgo H1 se concreta en esta tabla. Es lo que debería tener la base de "
                 "Coopaburrá y lo que hoy no tiene.")
 y = tabla(s, y, ["CAMPO", "QUÉ ES", "¿SECRETO?", "EN COOPABURRÁ HOY"], [
@@ -585,7 +615,7 @@ nota(s, y, "// POR QUÉ SE GUARDAN LOS PARÁMETROS JUNTO AL RESULTADO",
      "convivir varios factores durante la migración y subirlos poco a poco. Si no está, cambiar el parámetro "
      "invalida toda la base de un golpe.", alto=0.82)
 
-s, y = base(p, "// 37  PROBLEMA", "EL PROBLEMA DE MIGRAR 142.000 CONTRASEÑAS", sig(), titulo_tam=23)
+s, y = base(p, "// 39  PROBLEMA", "EL PROBLEMA DE MIGRAR 142.000 CONTRASEÑAS", sig(), titulo_tam=23)
 y = intro(s, y, "Este es el punto donde casi todos los proyectos se atascan, y es parte de la entrega 3. No lo "
                 "voy a resolver aquí: lo van a resolver ustedes.")
 y = tarjetas(s, y, [
@@ -603,7 +633,7 @@ nota(s, y, "// LO QUE SE EVALÚA DE ESTA PARTE",
      "y que diga qué pasa con las cuentas que no vuelven a entrar nunca. Esa última es la que casi nadie "
      "contempla.", alto=0.80)
 
-s, y = base(p, "// 38  COMPLEMENTO", "EL SEGUNDO FACTOR CAMBIA LA ECUACIÓN", sig())
+s, y = base(p, "// 40  COMPLEMENTO", "EL SEGUNDO FACTOR CAMBIA LA ECUACIÓN", sig())
 y = intro(s, y, "Todo lo anterior mejora la resistencia de la contraseña. Un segundo factor cambia el problema de "
                 "sitio, y para una entidad vigilada no es opcional.")
 y = tabla(s, y, ["FACTOR", "QUÉ APORTA", "LÍMITE"], [
@@ -618,7 +648,7 @@ nota(s, y, "// LA CONEXIÓN CON EL HALLAZGO H2",
      "firma individual. Eso es exactamente la sesión del jueves.", alto=0.85)
 
 # ─────────────── SECCIÓN 05 ───────────────
-s, y = base(p, "// 39  FUTURO", "LLAVES DE ACCESO: EL RELEVO DE LA CONTRASEÑA", sig(), titulo_tam=24)
+s, y = base(p, "// 41  FUTURO", "LLAVES DE ACCESO: EL RELEVO DE LA CONTRASEÑA", sig(), titulo_tam=24)
 y = intro(s, y, "El sector se está moviendo a un esquema en el que no hay contraseña que guardar ni que robar. "
                 "Conviene entenderlo, porque es exactamente el patrón que resuelve el hallazgo H2.")
 y = bloque_codigo(s, y, [
@@ -636,7 +666,7 @@ nota(s, y, "// POR QUÉ RESISTE EL ENGAÑO",
      "usar</b>, y el usuario no puede entregarla aunque quiera. Es la defensa técnica más sólida contra la "
      "suplantación, y la firma que la sostiene es el tema del jueves.", alto=0.88)
 
-s, y = base(p, "// 40  RECUPERACIÓN", "RECUPERACIÓN DE CUENTA: LA PUERTA QUE SE OLVIDA", sig(), titulo_tam=23)
+s, y = base(p, "// 42  RECUPERACIÓN", "RECUPERACIÓN DE CUENTA: LA PUERTA QUE SE OLVIDA", sig(), titulo_tam=23)
 y = intro(s, y, "Un sistema de autenticación es tan fuerte como su procedimiento de recuperación. Es la puerta por "
                 "la que entran los atacantes cuando la principal está bien cerrada.")
 y = tabla(s, y, ["VÍA DE RECUPERACIÓN", "CÓMO SE ATACA", "QUÉ LA HACE DEFENDIBLE"], [
@@ -653,7 +683,7 @@ nota(s, y, "// LA REGLA",
 seccion(p, "05", "LABORATORIO 3",
         "Cincuenta minutos · Atacar la evidencia B, con el ejercicio en Python", sig())
 
-s, y = base(p, "// 41  LABORATORIO", "LOS TRES EJERCICIOS", sig())
+s, y = base(p, "// 43  LABORATORIO", "LOS TRES EJERCICIOS", sig())
 y = intro(s, y, "Trabajan sobre la muestra real de la tabla de usuarios del caso, evidencia B del expediente. "
                 "Está anonimizada: los usuarios no existen, pero los resúmenes son auténticos.")
 y = pasos(s, y, [
@@ -669,7 +699,7 @@ nota(s, y, "// UNA ADVERTENCIA SOBRE EL EJERCICIO 2",
      "<b>Documenten la discrepancia entre lo que la documentación afirma y lo que los datos demuestran.</b> Eso "
      "es exactamente el trabajo de un auditor.", alto=0.82)
 
-s, y = base(p, "// 42  LABORATORIO", "PUNTO DE PARTIDA", sig())
+s, y = base(p, "// 44  LABORATORIO", "PUNTO DE PARTIDA", sig())
 y = bloque_codigo(s, y, [
     "# Evidencia B · muestra de la tabla de usuarios del portal",
     "1  usuario_a  5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8",
@@ -686,7 +716,7 @@ nota(s, y, "// LA PREGUNTA QUE ORDENA TODO EL EJERCICIO",
      "¿Cuál de las dos órdenes de arriba reproduce los resúmenes de la tabla? La respuesta decide si la sal se "
      "está aplicando o solo está documentada, y esa diferencia es un hallazgo con nombre propio.", alto=0.78)
 
-s, y = base(p, "// 43  PYTHON", "LABORATORIO 3 · EL EJERCICIO EN PYTHON", sig())
+s, y = base(p, "// 45  PYTHON", "LABORATORIO 3 · EL EJERCICIO EN PYTHON", sig())
 y = intro(s, y, "Los ejercicios 2 y 3 hechos con la biblioteca estándar: confirmar si la sal declarada se aplicó, y "
                 "medir cuánto cuesta un intento con factor de trabajo.")
 y = bloque_codigo(s, y, [
@@ -708,7 +738,7 @@ nota(s, y, "// LO QUE VA EN EL INFORME",
      "que costó scrypt?</b>", alto=0.85)
 
 # ─────────────── SECCIÓN 06 ───────────────
-s, y = base(p, "// 44  EVALUACIÓN", "PRIMERA EVALUACIÓN DE CONOCIMIENTO", sig())
+s, y = base(p, "// 46  EVALUACIÓN", "PRIMERA EVALUACIÓN DE CONOCIMIENTO", sig())
 y = intro(s, y, "Veinte minutos, individual, sin material. Cubre las sesiones 1 a 3 y vale el 15 % de la nota "
                 "del módulo. Estos son los temas, para que nadie estudie de más ni de menos.")
 y = tabla(s, y, ["TEMA", "QUÉ HAY QUE SABER HACER"], [
@@ -720,7 +750,7 @@ y = tabla(s, y, ["TEMA", "QUÉ HAY QUE SABER HACER"], [
     [("Contraseñas", {"bold": True}), "Explicar por qué no se cifran, qué hace la sal y para qué sirve el factor de trabajo"],
 ], [3.2, 6.8], alto_fila=0.48)
 
-s, y = base(p, "// 45  SÍNTESIS", "LO QUE LLEVAMOS DE LA SESIÓN", sig())
+s, y = base(p, "// 47  SÍNTESIS", "LO QUE LLEVAMOS DE LA SESIÓN", sig())
 pasos(s, y + 0.05, [
     ("Un resumen no autentica a nadie", "Detecta accidentes, no adversarios. Cualquiera puede recalcularlo."),
     ("MD5 y SHA-1 están rotos y siguen en producción", "Coopaburrá guarda 142.000 contraseñas con SHA-1."),
@@ -729,7 +759,7 @@ pasos(s, y + 0.05, [
     ("La sal constante de Coopaburrá no es una sal", "Es un sufijo, y no impide el ataque que de verdad importa."),
 ])
 
-s, y = base(p, "// 46  ENTREGA", "TERCERA PARTE DEL PRODUCTO", sig())
+s, y = base(p, "// 48  ENTREGA", "TERCERA PARTE DEL PRODUCTO", sig())
 y = intro(s, y, "Se entrega al inicio de la sesión 4: rediseño del almacenamiento de contraseñas y de la firma de "
                 "operaciones. Hallazgos H1 y H2.")
 y = tabla(s, y, ["SECCIÓN", "QUÉ DEBE CONTENER"], [
@@ -742,7 +772,7 @@ nota(s, y, "// LA PARTE DIFÍCIL ES LA TERCERA FILA",
      "Migrar contraseñas es el problema clásico: no se conocen las actuales, así que no se pueden volver a "
      "derivar. Hay una solución estándar y elegante, y encontrarla es parte del ejercicio.", alto=0.75)
 
-trabajo_independiente(p, "// 47  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SESIÓN 4"], [
+trabajo_independiente(p, "// 49  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SESIÓN 4"], [
     ("9 h", "TOTAL ENTRE", "MARTES Y JUEVES", False),
     ("3 h", "LECTURA", "PREVIA", False),
     ("6 h", "ENTREGA 3 E INFORME", "DEL LABORATORIO 3", True),
@@ -755,7 +785,7 @@ trabajo_independiente(p, "// 47  CIERRE", ["TRABAJO INDEPENDIENTE", "HASTA LA SE
    "Las 6 horas de elaboración son la entrega 3 (5 h, en equipo) y el informe del laboratorio (1 h).",
    sig(), titulo_lecturas="Lectura previa · 3 horas")
 
-s, y = base(p, "// 48  ADELANTO", "LO QUE VIENE EL JUEVES", sig())
+s, y = base(p, "// 50  ADELANTO", "LO QUE VIENE EL JUEVES", sig())
 y = intro(s, y, "Sesión 4: criptografía de llave pública y firma digital. Es la sesión que resuelve el problema "
                 "que hoy solo diagnosticamos.")
 tarjetas(s, y, [
@@ -769,7 +799,7 @@ tarjetas(s, y, [
         "Laboratorio: firmar, verificar y comparar el costo de RSA frente a curvas elípticas."]),
 ], alto=2.05)
 
-glosario(p, "// 49  GLOSARIO", 1, 2, [
+glosario(p, "// 51  GLOSARIO", 1, 2, [
     ("AES / ECB / CBC / GCM", "Advanced Encryption Standard y sus modos: Electronic Codebook, Cipher Block Chaining, Galois/Counter Mode. Sesión 2."),
     ("FIDO2 / WebAuthn", "Fast IDentity Online 2 / Web Authentication — Estándares de las llaves de acceso: una pareja de llaves por sitio."),
     ("FIPS", "Federal Information Processing Standards — Normas federales de procesamiento de información de Estados Unidos, del NIST."),
@@ -782,7 +812,7 @@ glosario(p, "// 49  GLOSARIO", 1, 2, [
     ("OWASP", "Open Worldwide Application Security Project — Fundación que publica guías abiertas de seguridad de aplicaciones."),
 ], sig())
 
-glosario(p, "// 50  GLOSARIO", 2, 2, [
+glosario(p, "// 52  GLOSARIO", 2, 2, [
     ("PDF", "Portable Document Format — Formato de documento. La colisión de SHA-1 de 2017 se demostró con dos PDF distintos."),
     ("RSA", "Rivest, Shamir y Adleman — Algoritmo de llave pública de 1977. Sesión 4."),
     ("SHA-1 / SHA-2 / SHA-256", "Secure Hash Algorithm — Funciones resumen del NIST. SHA-256 es la variante de 256 bits de la familia SHA-2."),
@@ -793,7 +823,7 @@ glosario(p, "// 50  GLOSARIO", 2, 2, [
     ("JWT / HS256", "JSON Web Token / HMAC con SHA-256 — Formato de token de sesión y su variante autenticada con llave compartida."),
 ], sig())
 
-fuentes(p, "// 51  FUENTES", "REFERENCIAS DE LA SESIÓN", [
+fuentes(p, "// 53  FUENTES", "REFERENCIAS DE LA SESIÓN", [
     ("NIST. (2015).", "FIPS 180-4: Secure Hash Standard y FIPS 202: SHA-3 Standard.", "Las familias SHA-2 y SHA-3"),
     ("Krawczyk, H., Bellare, M. y Canetti, R. (1997).", "RFC 2104: HMAC: Keyed-hashing for message authentication. IETF.", "La construcción anidada · lectura previa de la sesión 4"),
     ("Krawczyk, H. y Eronen, P. (2010).", "RFC 5869: HMAC-based extract-and-expand key derivation function (HKDF). IETF.", "Derivar varias llaves de un secreto"),
